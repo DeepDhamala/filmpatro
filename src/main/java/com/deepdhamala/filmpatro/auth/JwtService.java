@@ -1,6 +1,9 @@
 package com.deepdhamala.filmpatro.auth;
 
+import com.deepdhamala.filmpatro.auth.token.Token;
 import com.deepdhamala.filmpatro.auth.token.TokenRepository;
+import com.deepdhamala.filmpatro.auth.token.TokenType;
+import com.deepdhamala.filmpatro.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -8,8 +11,11 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -18,6 +24,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class JwtService {
@@ -51,8 +58,9 @@ public class JwtService {
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-        } catch (JwtException e){
-            throw new IllegalArgumentException("Invalid JWT token", e);
+        } catch (JwtException e) {
+            log.warn("Invalid JWT token: {} - Cause: {}", e.getMessage(), e.getCause() != null ? e.getCause().toString() : "None");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired JWT token", e);
         }
     }
 
@@ -115,5 +123,40 @@ public class JwtService {
         }
         return userEmail;
     }
+
+    public void saveUserToken(User user, String accessToken, String refreshToken) {
+        var token = Token.builder()
+                .user(user)
+                .token(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType(TokenType.BEARER)
+                .expired(false)
+                .revoked(false)
+                .build();
+        tokenRepository.save(token);
+    }
+
+    public Token saveUserTokenWithAuthCode(User user, String accessToken, String refreshToken) {
+        String authCodeForTokens = Jwts.builder()
+                .subject(user.getEmail())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 30_000)) // 30 sec
+                .claim("type", "ONE_TIME_TOKEN")
+                .signWith(secretKey, Jwts.SIG.HS256)
+                .compact();
+
+        var token = Token.builder()
+                .user(user)
+                .authCodeForTokens(authCodeForTokens)
+                .token(accessToken)
+                .refreshToken(refreshToken)
+                .tokenType(TokenType.BEARER)
+                .expired(false)
+                .revoked(false)
+                .build();
+
+        return tokenRepository.save(token);
+    }
+
 
 }

@@ -3,9 +3,28 @@ POST http://localhost:8080/api/v1/auth/user/register
 Content-Type: application/json
 
 {
-  "firstname": "Deep",
-  "lastname": "Dhamala",
-  "email": "dhamaladeep@gmail.com",
-  "password": "123456",
-  "role": "USER"
+  "firstname": "",
+  "lastname": "",
+  "email": "dhamaladeep4@gmail.com",
+  "password": "appleisredU1@",
+  "username": "apple2"
+}
+
+### User Authentication Request
+POST http://localhost:8080/api/v1/auth/user/authenticate
+Content-Type: application/json
+
+{
+  "email": "dhamaladeep2@gmail.com",
+  "password": "appleisredU1@"
+}
+
+> {% client.global.set("access-token", response.body.access_token); %}
+
+###
+POST http://localhost:8080/api/v1/auth/user/exchange-authcode-for-tokens
+Content-Type: application/json
+
+{
+  "authorizationCode": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaGFtYWxhZGVlcDJAZ21haWwuY29tIiwiaWF0IjoxNzQ5OTAwODMzLCJleHAiOjE3NDk5MDA4NjMsInR5cGUiOiJPTkVfVElNRV9UT0tFTiJ9.opMEVQLjgZrcX8kXhmoKwwDSPd7slGrW7BMFBhSWtuQ"
 }

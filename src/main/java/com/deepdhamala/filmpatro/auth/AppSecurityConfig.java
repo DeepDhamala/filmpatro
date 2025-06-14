@@ -1,12 +1,14 @@
 package com.deepdhamala.filmpatro.auth;
 
 import com.deepdhamala.filmpatro.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -32,17 +34,19 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @RequiredArgsConstructor
 @EnableMethodSecurity
 public class AppSecurityConfig {
+
     private final JwtAuthenticationFilter jwtAuthFilter;
     private static final String[] WHITE_LIST_URL = {"/api/v1/auth/user/**"};
 
     private final LogoutHandler logoutHandler;
 
-    private final PasswordEncoder passwordEncoder;
-    private final UserDetailsService userDetailsService;
+    private final AppUserAuthenticationProvider appUserAuthenticationProvider;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(req->
                         req.requestMatchers(WHITE_LIST_URL)
@@ -51,23 +55,26 @@ public class AppSecurityConfig {
                                 .authenticated()
                 )
                 .sessionManagement(session->session.sessionCreationPolicy(STATELESS))
-                .authenticationProvider(authenticationProvider())
+                .authenticationProvider(appUserAuthenticationProvider)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout ->
                         logout.logoutUrl("/api/v1/auth/user/logout")
                                 .addLogoutHandler(logoutHandler)
                                 .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
                 )
-
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .oauth2Login(oauth2 -> oauth2
+                        .successHandler(oAuth2LoginSuccessHandler)
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException)->{
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                        }))
+        ;
         return http.build();
     }
-    @Bean
-    public AuthenticationProvider authenticationProvider(){
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider(userDetailsService);
-        authenticationProvider.setPasswordEncoder(passwordEncoder);
-        return authenticationProvider;
-    }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();

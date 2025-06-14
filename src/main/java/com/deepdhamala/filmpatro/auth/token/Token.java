@@ -20,12 +20,19 @@ public class Token {
     @Column(unique = true)
     private String token;
 
+    @Column(unique = true)
+    private String refreshToken;
+
     @Enumerated(EnumType.STRING)
     private TokenType tokenType = TokenType.BEARER;
 
     private boolean revoked;
 
     private boolean expired;
+
+    private String authCodeForTokens;
+
+    private boolean isUsedAuthCodeForTokens;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

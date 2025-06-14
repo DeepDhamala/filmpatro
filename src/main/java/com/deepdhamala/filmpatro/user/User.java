@@ -2,11 +2,9 @@ package com.deepdhamala.filmpatro.user;
 
 import com.deepdhamala.filmpatro.common.AccountEntity;
 import com.deepdhamala.filmpatro.user.security.Role;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.envers.Audited;
 
 @Entity
@@ -19,10 +17,20 @@ import org.hibernate.envers.Audited;
 @Audited
 public class User extends AccountEntity {
 
-    private String firstName;
-    private String lastName;
+    private String fullName;
+
+    @Column(unique = true, nullable = false)
+    private String username;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
+    @JsonIgnore
     private String password;
+
+    private String avatarUrl;
+
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 
