@@ -1,7 +1,7 @@
 package com.deepdhamala.filmpatro.auth;
 
 import com.deepdhamala.filmpatro.user.UserRepository;
-import com.deepdhamala.filmpatro.user.security.UserPrincipal;
+import com.deepdhamala.filmpatro.auth.userAuth.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

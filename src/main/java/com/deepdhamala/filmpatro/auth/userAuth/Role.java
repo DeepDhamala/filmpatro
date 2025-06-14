@@ -1,4 +1,4 @@
-package com.deepdhamala.filmpatro.user.security;
+package com.deepdhamala.filmpatro.auth.userAuth;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.deepdhamala.filmpatro.user.security.Permission.*;
+import static com.deepdhamala.filmpatro.auth.userAuth.Permission.*;
 
 @RequiredArgsConstructor
 public enum Role {

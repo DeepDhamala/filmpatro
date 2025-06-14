@@ -7,8 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,16 +15,10 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
-import static com.deepdhamala.filmpatro.user.security.Permission.ADMIN_READ;
-import static com.deepdhamala.filmpatro.user.security.Role.ADMIN;
-import static com.deepdhamala.filmpatro.user.security.Role.MANAGER;
-import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -36,12 +28,14 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class AppSecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
-    private static final String[] WHITE_LIST_URL = {"/api/v1/auth/user/**"};
+    private static final String[] WHITE_LIST_URL = {"/api/v1/auth/user/**", "/api/v1/public/**"};
 
     private final LogoutHandler logoutHandler;
 
-    private final AppUserAuthenticationProvider appUserAuthenticationProvider;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+
+    private final UserDetailsService userDetailsService;
+    private final PasswordEncoder encoder;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -55,7 +49,7 @@ public class AppSecurityConfig {
                                 .authenticated()
                 )
                 .sessionManagement(session->session.sessionCreationPolicy(STATELESS))
-                .authenticationProvider(appUserAuthenticationProvider)
+                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout ->
                         logout.logoutUrl("/api/v1/auth/user/logout")
@@ -69,7 +63,7 @@ public class AppSecurityConfig {
                         .authenticationEntryPoint((request, response, authException)->{
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType("application/json");
-                            response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                            response.getWriter().write("{\"error\": \"Unauthorized\"}"+authException);
                         }))
         ;
         return http.build();
@@ -78,5 +72,12 @@ public class AppSecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        CustomDaoAuthenticationProvider provider = new CustomDaoAuthenticationProvider(userDetailsService);
+        provider.setPasswordEncoder(encoder);
+        return provider;
     }
 }

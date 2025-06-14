@@ -1,16 +1,19 @@
 package com.deepdhamala.filmpatro.auth;
 
+import com.deepdhamala.filmpatro.auth.otp.*;
+import com.deepdhamala.filmpatro.auth.userAuth.*;
 import com.deepdhamala.filmpatro.auth.token.TokenRepository;
+import com.deepdhamala.filmpatro.email.EmailService;
 import com.deepdhamala.filmpatro.user.User;
 import com.deepdhamala.filmpatro.user.UserMapper;
 import com.deepdhamala.filmpatro.user.UserRepository;
 import com.deepdhamala.filmpatro.user.UserService;
-import com.deepdhamala.filmpatro.user.security.*;
 import io.jsonwebtoken.Claims;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,19 +33,27 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final TokenRepository tokenRepository;
     private final AuthenticationManager authenticationManager;
+    private final EmailService emailService;
+    private final OtpService otpService;
+    private final OtpRepository otpRepository;
+    private final OtpValidator otpValidator;
 
     @Transactional
-    public UserAuthenticationResponseDto userRegistration(UserRegisterRequestDto userRequestRequestDto) {
+    public void userRegistration(UserRegisterRequestDto userRequestRequestDto) {
 
         userService.validateUserDoesNotExist(userRequestRequestDto.getEmail(), userRequestRequestDto.getUsername());
 
         var user = userMapper.fromRegisterRequestDto(userRequestRequestDto);
 
         var savedUser = userRepository.save(user);
-        return getUserAuthenticationResponseDto(savedUser);
+
+        String otp = otpService.generateOtp();
+        var otpToken = otpService.saveOtp(savedUser, otp);
+        emailService.sendOtpEmail(savedUser.getEmail(), otp);
+
     }
 
-    public UserAuthenticationResponseDto userAuthentication(AuthenticationRequestDto authenticationRequestDto){
+    public UserAuthenticationResponseDto userAuthentication(AuthenticationRequestDto authenticationRequestDto) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         authenticationRequestDto.getEmail(),
@@ -91,5 +102,20 @@ public class AuthenticationService {
                 .accessToken(token.getToken())
                 .refreshToken(token.getRefreshToken())
                 .build();
+    }
+
+    public UserAuthenticationResponseDto verifyOtp(OtpVerificationRequestDto otpVerificationRequestDto) {
+
+        var user = userRepository.findByEmail(otpVerificationRequestDto.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        var otpEntity = otpRepository.findByUser(user).orElse(null);
+        otpValidator.validateOtp(otpEntity, otpVerificationRequestDto.getOtp());
+        otpEntity.setUsed(true);
+        otpRepository.save(otpEntity);
+
+        user.setEnabled(true);
+        userRepository.save(user);
+        return getUserAuthenticationResponseDto(user);
     }
 }

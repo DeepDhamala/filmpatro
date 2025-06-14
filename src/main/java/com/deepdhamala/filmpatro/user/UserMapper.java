@@ -1,7 +1,7 @@
 package com.deepdhamala.filmpatro.user;
 
-import com.deepdhamala.filmpatro.user.security.Role;
-import com.deepdhamala.filmpatro.user.security.UserRegisterRequestDto;
+import com.deepdhamala.filmpatro.auth.userAuth.Role;
+import com.deepdhamala.filmpatro.auth.userAuth.UserRegisterRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,6 @@ public class UserMapper {
 
     public User fromRegisterRequestDto(UserRegisterRequestDto userRegisterRequestDto) {
         return User.builder()
-                .fullName(userRegisterRequestDto.getFirstname())
                 .username(userRegisterRequestDto.getUsername())
                 .email(userRegisterRequestDto.getEmail())
                 .password(passwordEncoder.encode(userRegisterRequestDto.getPassword())) // secure the password here

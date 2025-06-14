@@ -3,9 +3,7 @@ POST http://localhost:8080/api/v1/auth/user/register
 Content-Type: application/json
 
 {
-  "firstname": "",
-  "lastname": "",
-  "email": "dhamaladeep4@gmail.com",
+  "email": "dhamaladeepgmail.com",
   "password": "appleisredU1@",
   "username": "apple2"
 }
@@ -15,16 +13,24 @@ POST http://localhost:8080/api/v1/auth/user/authenticate
 Content-Type: application/json
 
 {
-  "email": "dhamaladeep2@gmail.com",
+  "email": "dhamaladeep@gmail.com",
   "password": "appleisredU1@"
 }
 
-> {% client.global.set("access-token", response.body.access_token); %}
 
 ###
 POST http://localhost:8080/api/v1/auth/user/exchange-authcode-for-tokens
 Content-Type: application/json
 
 {
-  "authorizationCode": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaGFtYWxhZGVlcDJAZ21haWwuY29tIiwiaWF0IjoxNzQ5OTAwODMzLCJleHAiOjE3NDk5MDA4NjMsInR5cGUiOiJPTkVfVElNRV9UT0tFTiJ9.opMEVQLjgZrcX8kXhmoKwwDSPd7slGrW7BMFBhSWtuQ"
+  "authorizationCode": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaGFtYWxhZGVlcEBnbWFpbC5jb20iLCJpYXQiOjE3NDk5MjAwNDksImV4cCI6MTc0OTkyMDA3OSwidHlwZSI6Ik9ORV9USU1FX1RPS0VOIn0.IJJIAoKoOpAwiHjQN85tP7__dot1pGB41lJamdLbAtw"
+}
+
+###
+POST http://localhost:8080/api/v1/auth/user/verify-otp
+Content-Type: application/json
+
+{
+  "email": "dhamaladeep@gmail.com",
+  "otp": "527391"
 }

@@ -2,8 +2,8 @@ package com.deepdhamala.filmpatro.common;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -13,7 +13,10 @@ import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
 @MappedSuperclass
+@SuperBuilder
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class AuditableEntity extends BaseEntity{
     @CreatedDate
     @Column(updatable = false)

@@ -1,10 +1,9 @@
 package com.deepdhamala.filmpatro.auth;
 
+import com.deepdhamala.filmpatro.auth.userAuth.UserPrincipal;
 import com.deepdhamala.filmpatro.user.User;
 import com.deepdhamala.filmpatro.user.UserRepository;
-import com.deepdhamala.filmpatro.user.security.Role;
-import com.deepdhamala.filmpatro.user.security.UserAuthenticationResponseDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.deepdhamala.filmpatro.auth.userAuth.Role;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -49,6 +48,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             user = User.builder()
                     .email(email)
                     .fullName(fullName)
+                    .enabled(true)
                     .avatarUrl(avatarUrl)
                     .username(usernameToUse)
                     .password(null)
@@ -59,8 +59,17 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         else {
 //            Get the existing user if it exists
             user = userOptional.get();
+            if(!user.isEnabled()) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Its look like you have active registration pending with this email. Please verify your email through opt first. Hint: Try to login with email and password then otp will be sent to your email, verify with that and  from next on wards you can follow this authentication");
+                return;
+            }
+            if (!user.isAccountNonLocked() || !user.isCredentialsNonExpired() || !user.isAccountNonExpired()) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Account not in a valid state.");
+                return;
+            }
+
         }
-        var userPrincipal = com.deepdhamala.filmpatro.user.security.UserPrincipal.builder()
+        var userPrincipal = UserPrincipal.builder()
                 .user(user)
                 .build();
         String accessToken = jwtService.generateUserResourceAccessToken(userPrincipal);

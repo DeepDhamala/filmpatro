@@ -1,4 +1,4 @@
-package com.deepdhamala.filmpatro.user.security;
+package com.deepdhamala.filmpatro.auth.userAuth;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,9 +1,10 @@
 package com.deepdhamala.filmpatro.user;
 
 import com.deepdhamala.filmpatro.common.AccountEntity;
-import com.deepdhamala.filmpatro.user.security.Role;
+import com.deepdhamala.filmpatro.auth.userAuth.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.envers.Audited;
 
@@ -11,7 +12,7 @@ import org.hibernate.envers.Audited;
 @Table(name = "users")
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Audited
