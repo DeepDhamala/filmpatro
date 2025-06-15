@@ -13,15 +13,17 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +39,8 @@ public class AuthenticationService {
     private final OtpService otpService;
     private final OtpRepository otpRepository;
     private final OtpValidator otpValidator;
+    private final PasswordEncoder passwordEncoder;
+    private final ForgetPasswordResetRepository forgetPasswordResetRepository;
 
     @Transactional
     public void userRegistration(UserRegisterRequestDto userRequestRequestDto) {
@@ -117,5 +121,106 @@ public class AuthenticationService {
         user.setEnabled(true);
         userRepository.save(user);
         return getUserAuthenticationResponseDto(user);
+    }
+
+    public UserAuthenticationResponseDto refreshTokenForTokens(RefreshTokenForTokensDto refreshTokenForTokensDto) {
+        String refreshToken = refreshTokenForTokensDto.getRefreshToken();
+
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Refresh token is required");
+        }
+
+        String userEmail = jwtService.extractUsernameFromJwt(refreshToken);
+        if (userEmail == null || userEmail.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid refresh token");
+        }
+
+        var user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        var userPrincipal = UserPrincipal.builder()
+                .user(user)
+                .build();
+
+        if (!jwtService.isTokenValid(refreshToken, userPrincipal)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token is expired or invalid");
+        }
+
+        var accessToken = jwtService.generateUserResourceAccessToken(userPrincipal);
+        jwtService.saveUserToken(user, accessToken, refreshToken);
+
+        return UserAuthenticationResponseDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken) // can also rotate if needed
+                .build();
+    }
+
+    private void revokeAllUserTokens(User user) {
+        var validUserTokens = tokenRepository.findAllValidTokenByUser(user.getId());
+        if (validUserTokens.isEmpty())
+            return;
+        validUserTokens.forEach(token -> {
+            token.setExpired(true);
+            token.setRevoked(true);
+        });
+        tokenRepository.saveAll(validUserTokens);
+    }
+
+    public void changePassword(ChangePasswordRequestDto changePasswordRequestDto, Principal connectedUser) {
+
+        var user = (User) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+
+        // check if the current password is correct
+        if (!passwordEncoder.matches(changePasswordRequestDto.getOldPassword(), user.getPassword())) {
+            throw new IllegalStateException("Wrong password");
+        }
+        // check if the two new passwords are the same
+        if (!changePasswordRequestDto.getNewPassword().equals(changePasswordRequestDto.getConfirmNewPassword())) {
+            throw new IllegalStateException("Password are not the same");
+        }
+
+        revokeAllUserTokens(user);
+
+        user.setPassword(passwordEncoder.encode(changePasswordRequestDto.getNewPassword()));
+
+        userRepository.save(user);
+    }
+
+    public void recoverForgetPassword(@Valid ForgotPasswordRequestDto forgotPasswordRequestDto) {
+        var user = userRepository.findByEmail(forgotPasswordRequestDto.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        String token = UUID.randomUUID().toString();
+        LocalDateTime expiry = LocalDateTime.now().plusMinutes(15);
+        var resetToken = ForgetPasswordResetToken.builder()
+                .user(user)
+                .forgetPasswordResetToken(token)
+                .expiryDate(expiry)
+                .build();
+        forgetPasswordResetRepository.save(resetToken);
+        String link = "https://localhost:5500/?forgetPasswordRecoverytoken=" + token;
+        emailService.sendEmail(
+                user.getEmail(),
+                "Password Reset Request",
+                "Click the link to reset your password: " + link);
+    }
+
+    public void resetForgetPassword(@Valid ForgetPasswordResetRequestDto forgetPasswordResetRequestDto) {
+        var token = forgetPasswordResetRepository.findByForgetPasswordResetToken(forgetPasswordResetRequestDto.getForgetPasswordResetToken())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid or expired token"));
+
+        if (token.isUsed()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token has already been used");
+        }
+
+        if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Token has expired");
+        }
+
+        var user = token.getUser();
+        user.setPassword(passwordEncoder.encode(forgetPasswordResetRequestDto.getNewPassword()));
+        userRepository.save(user);
+        token.setUsed(true);
+        forgetPasswordResetRepository.save(token);
     }
 }

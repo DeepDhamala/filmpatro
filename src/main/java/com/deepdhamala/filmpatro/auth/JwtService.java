@@ -5,6 +5,7 @@ import com.deepdhamala.filmpatro.auth.token.TokenRepository;
 import com.deepdhamala.filmpatro.auth.token.TokenType;
 import com.deepdhamala.filmpatro.user.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -58,9 +59,12 @@ public class JwtService {
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
+        } catch (ExpiredJwtException e) {
+            log.warn("Expired JWT token: {}", e.getMessage());
+            throw new JwtAuthenticationException("JWT token has expired", e);
         } catch (JwtException e) {
-            log.warn("Invalid JWT token: {} - Cause: {}", e.getMessage(), e.getCause() != null ? e.getCause().toString() : "None");
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired JWT token", e);
+            log.warn("Invalid JWT token: {}", e.getMessage());
+            throw new JwtAuthenticationException("Invalid JWT token", e);
         }
     }
 
@@ -109,18 +113,21 @@ public class JwtService {
     private boolean isTokenNonExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
+
     public String validateAndExtractUsername(String token) {
-        // Validate JWT syntax, signature, and expiry
+
         String userEmail = extractUsernameFromJwt(token);
         if (userEmail == null) {
-            throw new IllegalArgumentException("Invalid token: username missing");
+            throw new JwtAuthenticationException("Invalid token: username missing");
         }
-        // Validate DB
+
         var valid = tokenRepository.findByToken(token)
                 .map(t -> !t.isExpired() && !t.isRevoked()).orElse(false);
+
         if (!valid) {
-            throw new IllegalArgumentException("Token revoked or expired in database");
+            throw new JwtAuthenticationException("Token revoked or expired.");
         }
+
         return userEmail;
     }
 
@@ -141,7 +148,7 @@ public class JwtService {
                 .subject(user.getEmail())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 30_000)) // 30 sec
-                .claim("type", "ONE_TIME_TOKEN")
+                .claim("type", "auth_code")
                 .signWith(secretKey, Jwts.SIG.HS256)
                 .compact();
 

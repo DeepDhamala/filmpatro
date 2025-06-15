@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/v1/auth/user")
@@ -22,8 +23,7 @@ public class UserAuthenticationController {
     public ResponseEntity<ApiResponse<String>> registerUser(
             @RequestBody @Valid UserRegisterRequestDto userRegisterRequestDto) {
         authenticationService.userRegistration(userRegisterRequestDto);
-        ApiResponse<String> response = ApiResponse.success(null, "User Registration Successful!");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(null, "User Registration Successful!"));
     }
 
     @PostMapping("/authenticate")
@@ -31,14 +31,22 @@ public class UserAuthenticationController {
             @RequestBody @Valid AuthenticationRequestDto authenticationRequestDto
     ) {
         UserAuthenticationResponseDto authResponse = authenticationService.userAuthentication(authenticationRequestDto);
-        ApiResponse<UserAuthenticationResponseDto> response = ApiResponse.success(authResponse, "Authentication successful");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(authResponse, "Authentication successful!"));
     }
 
+    @PostMapping("/refreshtoken-for-tokens")
+    public ResponseEntity<ApiResponse<UserAuthenticationResponseDto>> refreshTokenForTokens(
+            @RequestBody @Valid RefreshTokenForTokensDto refreshTokenForTokensDto) {
+        UserAuthenticationResponseDto refreshResponse = authenticationService.refreshTokenForTokens(refreshTokenForTokensDto);
+        return ResponseEntity.ok(ApiResponse.success(refreshResponse, "Tokens refreshed successfully"));
+    }
+
+
     @PostMapping("/exchange-authcode-for-tokens")
-    public ResponseEntity<UserAuthenticationResponseDto> exchangeAuthCodeForTokens(
+    public ResponseEntity<ApiResponse<UserAuthenticationResponseDto>> exchangeAuthCodeForTokens(
             @RequestBody @Valid AuthCodeForTokensDto authCodeForTokensDto) {
-        return ResponseEntity.ok(authenticationService.exchangeAuthCodeForTokens(authCodeForTokensDto));
+        UserAuthenticationResponseDto exchangeResponse = authenticationService.exchangeAuthCodeForTokens(authCodeForTokensDto);
+        return ResponseEntity.ok(ApiResponse.success(exchangeResponse, "Tokens exchanged successfully"));
     }
 
     @GetMapping("/google/login")
@@ -47,12 +55,31 @@ public class UserAuthenticationController {
     }
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<String> verifyOtp(
+    public ResponseEntity<ApiResponse<UserAuthenticationResponseDto>> verifyOtp(
             @RequestBody @Valid OtpVerificationRequestDto otpVerificationRequestDto) {
-        authenticationService.verifyOtp(otpVerificationRequestDto);
-        return ResponseEntity.ok("OTP verified successfully. Account activated.");
+        UserAuthenticationResponseDto userAuthenticationResponseDto = authenticationService.verifyOtp(otpVerificationRequestDto);
+        return ResponseEntity.ok(ApiResponse.success(userAuthenticationResponseDto, "OTP verification successful"));
     }
 
+    @PostMapping("/change-password")
+    public ResponseEntity<ApiResponse<String>> changePassword(
+            @RequestBody @Valid ChangePasswordRequestDto changePasswordRequestDto,
+            Principal loggedInUser) {
+        authenticationService.changePassword(changePasswordRequestDto, loggedInUser);
+        return ResponseEntity.ok(ApiResponse.success(null, "Password changed successfully"));
+    }
 
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<String>> forgotPassword(
+            @RequestBody @Valid ForgotPasswordRequestDto forgotPasswordRequestDto) {
+        authenticationService.recoverForgetPassword(forgotPasswordRequestDto);
+        return ResponseEntity.ok(ApiResponse.success(null, "Forgot password request processed successfully"));
+    }
 
+    @PostMapping("/reset-forgot-password")
+    public ResponseEntity<ApiResponse<String>> resetForgotPassword(
+            @RequestBody @Valid ForgetPasswordResetRequestDto resetForgetPasswordRequestDto) {
+        authenticationService.resetForgetPassword(resetForgetPasswordRequestDto);
+        return ResponseEntity.ok(ApiResponse.success(null, "Forgot password reset successfully"));
+    }
 }
