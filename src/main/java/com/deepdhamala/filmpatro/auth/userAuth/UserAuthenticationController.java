@@ -1,7 +1,8 @@
 package com.deepdhamala.filmpatro.auth.userAuth;
 
 import com.deepdhamala.filmpatro.auth.AuthenticationService;
-import com.deepdhamala.filmpatro.auth.otp.OtpVerificationRequestDto;
+import com.deepdhamala.filmpatro.auth.token.emailVerification.EmailVerificationTokenService;
+import com.deepdhamala.filmpatro.auth.token.emailVerification.OtpVerificationRequestDto;
 import com.deepdhamala.filmpatro.common.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -18,11 +19,12 @@ import java.security.Principal;
 public class UserAuthenticationController {
 
     private final AuthenticationService authenticationService;
+    private final EmailVerificationTokenService emailVerificationTokenService;
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<String>> registerUser(
             @RequestBody @Valid UserRegisterRequestDto userRegisterRequestDto) {
-        authenticationService.userRegistration(userRegisterRequestDto);
+        authenticationService.registerUser(userRegisterRequestDto);
         return ResponseEntity.ok(ApiResponse.success(null, "User Registration Successful!"));
     }
 
@@ -81,5 +83,11 @@ public class UserAuthenticationController {
             @RequestBody @Valid ForgetPasswordResetRequestDto resetForgetPasswordRequestDto) {
         authenticationService.resetForgetPassword(resetForgetPasswordRequestDto);
         return ResponseEntity.ok(ApiResponse.success(null, "Forgot password reset successfully"));
+    }
+
+    @GetMapping("/verify-email")
+    public ResponseEntity<ApiResponse<String>> verifyEmail(@RequestParam String token) {
+        emailVerificationTokenService.verifyEmail(token);
+        return ResponseEntity.ok(ApiResponse.success(null, "Email verification successful"));
     }
 }

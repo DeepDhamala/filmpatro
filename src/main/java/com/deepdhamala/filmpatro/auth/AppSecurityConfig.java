@@ -42,13 +42,13 @@ public class AppSecurityConfig {
         http
 
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(req->
+                .authorizeHttpRequests(req ->
                         req.requestMatchers(WHITE_LIST_URL)
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated()
                 )
-                .sessionManagement(session->session.sessionCreationPolicy(STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout ->
@@ -60,10 +60,15 @@ public class AppSecurityConfig {
                         .successHandler(oAuth2LoginSuccessHandler)
                 )
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint((request, response, authException)->{
+                        .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType("application/json");
-                            response.getWriter().write("{\"error\": \"Unauthorized\"}"+authException);
+                            response.getWriter().write("""
+                                    {
+                                      "status": 401,
+                                      "error": "Access Denied. Illegal Request attempt Recorded."
+                                    }
+                                    """);
                         }))
         ;
         return http.build();

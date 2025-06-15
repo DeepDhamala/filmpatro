@@ -3,9 +3,27 @@ POST http://localhost:8080/api/v1/auth/user/register
 Content-Type: application/json
 
 {
-  "email": "dhamaladeepgmail.com",
-  "password": "appleisredU1@",
-  "username": "apple2"
+  "email": "dhamaladeep@gmail.com",
+  "password": "Deep@1234",
+  "username": "deep"
+}
+
+### Forgot Password Request
+POST http://localhost:8080/api/v1/auth/user/forgot-password
+Content-Type: application/json
+
+{
+  "email": "dhamaladeep@gmail.com"
+}
+
+###
+POST http://localhost:8080/api/v1/auth/user/reset-forgot-password
+Content-Type: application/json
+
+{
+  "forgetPasswordResetToken": "60cf4fa1-b9b1-4bb1-9099-4a4098f3143a",
+  "newPassword": "DEEp@1234",
+  "confirmNewPassword": "DEEP@1234"
 }
 
 ### User Authentication Request
@@ -14,7 +32,7 @@ Content-Type: application/json
 
 {
   "email": "dhamaladeep@gmail.com",
-  "password": "appleisredU1@"
+  "password": "DEEp@1234"
 }
 
 
@@ -23,7 +41,7 @@ POST http://localhost:8080/api/v1/auth/user/exchange-authcode-for-tokens
 Content-Type: application/json
 
 {
-  "authorizationCode": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaGFtYWxhZGVlcEBnbWFpbC5jb20iLCJpYXQiOjE3NDk5MjAwNDksImV4cCI6MTc0OTkyMDA3OSwidHlwZSI6Ik9ORV9USU1FX1RPS0VOIn0.IJJIAoKoOpAwiHjQN85tP7__dot1pGB41lJamdLbAtw"
+  "authorizationCode": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaGFtYWxhZGVlcDJAZ21haWwuY29tIiwiaWF0IjoxNzUwMDE0MjA3LCJleHAiOjE3NTAwMTQyMzcsInR5cGUiOiJhdXRoX2NvZGUifQ.Hcw9bjSqU4fzyapcn2dSYULqiDfsDmAS-Qbgno2AyRE"
 }
 
 ###

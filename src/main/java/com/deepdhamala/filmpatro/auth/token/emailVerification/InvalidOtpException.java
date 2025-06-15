@@ -1,4 +1,4 @@
-package com.deepdhamala.filmpatro.auth.otp;
+package com.deepdhamala.filmpatro.auth.token.emailVerification;
 
 public class InvalidOtpException extends RuntimeException{
 

@@ -1,17 +1,21 @@
 package com.deepdhamala.filmpatro.auth;
 
 import com.deepdhamala.filmpatro.auth.userAuth.UserPrincipal;
+import com.deepdhamala.filmpatro.common.ApiResponse;
 import com.deepdhamala.filmpatro.user.User;
 import com.deepdhamala.filmpatro.user.UserRepository;
 import com.deepdhamala.filmpatro.auth.userAuth.Role;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -31,8 +35,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         String avatarUrl = oAuth2User.getAttribute("picture");
 
         if(email == null || fullName == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Email or username not provided by OAuth2 provider.");
-            return;
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email or username not provided by OAuth2 provider.");
         }
 
         Optional<User> userOptional = userRepository.findByEmail(email);
@@ -60,14 +63,21 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 //            Get the existing user if it exists
             user = userOptional.get();
             if(!user.isEnabled()) {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Its look like you have active registration pending with this email. Please verify your email through opt first. Hint: Try to login with email and password then otp will be sent to your email, verify with that and  from next on wards you can follow this authentication");
+                var errorBody = ApiResponse.error(HttpStatus.FORBIDDEN.value(), "It's look like you have active registration pending with this email. Please verify your email through the link sent to your email. Hint: Try to login with email and password then verification link will be sent to your email, verify with that and from next on you can use this method. Incase of forget password, use the forgot password link.");
+                String json = new ObjectMapper().writeValueAsString(errorBody);
+                response.setStatus(HttpStatus.FORBIDDEN.value());
+                response.setContentType("application/json");
+                response.getWriter().write(json);
                 return;
             }
             if (!user.isAccountNonLocked() || !user.isCredentialsNonExpired() || !user.isAccountNonExpired()) {
-                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Account not in a valid state.");
+                var errorBody = ApiResponse.error(HttpStatus.FORBIDDEN.value(), "Your account is either locked or expired. Please contact support.");
+                String json = new ObjectMapper().writeValueAsString(errorBody);
+                response.setStatus(HttpStatus.FORBIDDEN.value());
+                response.setContentType("application/json");
+                response.getWriter().write(json);
                 return;
             }
-
         }
         var userPrincipal = UserPrincipal.builder()
                 .user(user)
@@ -77,7 +87,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         String authCode = jwtService.saveUserTokenWithAuthCode(user, accessToken, refreshToken).getAuthCodeForTokens();
 
-        String redirectUrl = "http://localhost:5500/?authcode="+ authCode;
+        String redirectUrl = "http://localhost:8080/?authcode="+ authCode;
         response.sendRedirect(redirectUrl);
     }
 }

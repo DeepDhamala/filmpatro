@@ -1,6 +1,6 @@
 package com.deepdhamala.filmpatro.auth;
 
-import com.deepdhamala.filmpatro.auth.otp.InvalidOtpException;
+import com.deepdhamala.filmpatro.auth.token.emailVerification.InvalidOtpException;
 import com.deepdhamala.filmpatro.common.ApiResponse;
 import com.deepdhamala.filmpatro.user.UserAlreadyExistsException;
 import org.springframework.http.HttpStatus;

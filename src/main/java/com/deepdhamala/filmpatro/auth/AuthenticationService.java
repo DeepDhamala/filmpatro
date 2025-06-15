@@ -1,8 +1,8 @@
 package com.deepdhamala.filmpatro.auth;
 
-import com.deepdhamala.filmpatro.auth.otp.*;
-import com.deepdhamala.filmpatro.auth.userAuth.*;
 import com.deepdhamala.filmpatro.auth.token.TokenRepository;
+import com.deepdhamala.filmpatro.auth.token.emailVerification.*;
+import com.deepdhamala.filmpatro.auth.userAuth.*;
 import com.deepdhamala.filmpatro.email.EmailService;
 import com.deepdhamala.filmpatro.user.User;
 import com.deepdhamala.filmpatro.user.UserMapper;
@@ -36,14 +36,14 @@ public class AuthenticationService {
     private final TokenRepository tokenRepository;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
-    private final OtpService otpService;
-    private final OtpRepository otpRepository;
-    private final OtpValidator otpValidator;
+    public final EmailVerificationTokenService emailVerificationTokenService;
     private final PasswordEncoder passwordEncoder;
     private final ForgetPasswordResetRepository forgetPasswordResetRepository;
+    private final OtpValidator otpValidator;
+    private final EmailVerificationTokenRepository emailVerificationTokenRepository;
 
     @Transactional
-    public void userRegistration(UserRegisterRequestDto userRequestRequestDto) {
+    public void registerUser(UserRegisterRequestDto userRequestRequestDto) {
 
         userService.validateUserDoesNotExist(userRequestRequestDto.getEmail(), userRequestRequestDto.getUsername());
 
@@ -51,9 +51,9 @@ public class AuthenticationService {
 
         var savedUser = userRepository.save(user);
 
-        String otp = otpService.generateOtp();
-        var otpToken = otpService.saveOtp(savedUser, otp);
-        emailService.sendOtpEmail(savedUser.getEmail(), otp);
+        EmailVerificationToken emailVerificationToken = emailVerificationTokenService.prepareEmailVerificationToken(savedUser);
+
+        emailService.sendEmailVerificationEmail(savedUser.getEmail(), emailVerificationToken);
 
     }
 
@@ -70,7 +70,7 @@ public class AuthenticationService {
 
     }
 
-    private UserAuthenticationResponseDto getUserAuthenticationResponseDto(User user) {
+    public UserAuthenticationResponseDto getUserAuthenticationResponseDto(User user) {
         var userPrincipal = UserPrincipal.builder()
                 .user(user)
                 .build();
@@ -106,21 +106,6 @@ public class AuthenticationService {
                 .accessToken(token.getToken())
                 .refreshToken(token.getRefreshToken())
                 .build();
-    }
-
-    public UserAuthenticationResponseDto verifyOtp(OtpVerificationRequestDto otpVerificationRequestDto) {
-
-        var user = userRepository.findByEmail(otpVerificationRequestDto.getEmail())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-        var otpEntity = otpRepository.findByUser(user).orElse(null);
-        otpValidator.validateOtp(otpEntity, otpVerificationRequestDto.getOtp());
-        otpEntity.setUsed(true);
-        otpRepository.save(otpEntity);
-
-        user.setEnabled(true);
-        userRepository.save(user);
-        return getUserAuthenticationResponseDto(user);
     }
 
     public UserAuthenticationResponseDto refreshTokenForTokens(RefreshTokenForTokensDto refreshTokenForTokensDto) {
@@ -198,7 +183,7 @@ public class AuthenticationService {
                 .expiryDate(expiry)
                 .build();
         forgetPasswordResetRepository.save(resetToken);
-        String link = "https://localhost:5500/?forgetPasswordRecoverytoken=" + token;
+        String link = "https://localhost:8080/?forgetPasswordRecoverytoken=" + token;
         emailService.sendEmail(
                 user.getEmail(),
                 "Password Reset Request",
@@ -222,5 +207,20 @@ public class AuthenticationService {
         userRepository.save(user);
         token.setUsed(true);
         forgetPasswordResetRepository.save(token);
+    }
+
+    public UserAuthenticationResponseDto verifyOtp(OtpVerificationRequestDto otpVerificationRequestDto) {
+
+        var user = userRepository.findByEmail(otpVerificationRequestDto.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        var otpEntity = emailVerificationTokenRepository.findByUser(user).orElse(null);
+        otpValidator.validateOtp(otpEntity, otpVerificationRequestDto.getOtp());
+        otpEntity.setUsed(true);
+        emailVerificationTokenRepository.save(otpEntity);
+
+        user.setEnabled(true);
+        userRepository.save(user);
+        return getUserAuthenticationResponseDto(user);
     }
 }

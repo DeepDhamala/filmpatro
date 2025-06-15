@@ -1,4 +1,4 @@
-package com.deepdhamala.filmpatro.auth.otp;
+package com.deepdhamala.filmpatro.auth.token.emailVerification;
 
 import com.deepdhamala.filmpatro.common.AuditableEntity;
 import com.deepdhamala.filmpatro.user.User;
@@ -14,13 +14,13 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-public class OtpToken extends AuditableEntity {
+public class EmailVerificationToken extends AuditableEntity {
 
     @Column(nullable = false, unique = true)
-    private String otp;
+    private String emailVerificationToken;
 
     @Column(nullable = false)
-    private LocalDateTime expiresAt;
+    private LocalDateTime expiryDate;
 
     @Column(nullable = false)
     private boolean used = false;
