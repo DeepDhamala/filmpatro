@@ -1,54 +1,50 @@
-### User Registration Request
-POST http://localhost:8080/api/v1/auth/user/register
+### User Registration
+POST http://localhost:8080/api/v2/auth/user/registration/register
 Content-Type: application/json
 
 {
   "email": "dhamaladeep@gmail.com",
   "password": "Deep@1234",
+  "confirmPassword": "Deep@1234",
   "username": "deep"
 }
 
-### Forgot Password Request
-POST http://localhost:8080/api/v1/auth/user/forgot-password
-Content-Type: application/json
 
-{
-  "email": "dhamaladeep@gmail.com"
-}
+### Email Verification After User Registration
+GET http://localhost:8080/api/v2/auth/user/registration/verify-email?verificationCode={{verificationCode}}
 
-###
-POST http://localhost:8080/api/v1/auth/user/reset-forgot-password
-Content-Type: application/json
 
-{
-  "forgetPasswordResetToken": "60cf4fa1-b9b1-4bb1-9099-4a4098f3143a",
-  "newPassword": "DEEp@1234",
-  "confirmNewPassword": "DEEP@1234"
-}
-
-### User Authentication Request
-POST http://localhost:8080/api/v1/auth/user/authenticate
+### User Authentication (Login)
+POST http://localhost:8080/api/v2/auth/user/authentication/authenticate
 Content-Type: application/json
 
 {
   "email": "dhamaladeep@gmail.com",
-  "password": "DEEp@1234"
+  "password": "Deep@1234"
 }
 
 
-###
-POST http://localhost:8080/api/v1/auth/user/exchange-authcode-for-tokens
+### Change Password
+POST http://localhost:8080/api/v2/auth/user/password/change
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaGFtYWxhZGVlcEBnbWFpbC5jb20iLCJpYXQiOjE3NTAwOTE3MTYsImV4cCI6MTc1MjY4MzcxNn0.qN6dcwhpMigsfLOwgEyDat9THGBLFLL8d_JTMcUDtxE
+
+{
+  "oldPassword": "Deep@1234",
+  "Password": "Deep@1234",
+  "confirmPassword": "Deep@1234"
+}
+
+
+### Exchange Authorization Code for Tokens
+POST http://localhost:8080/api/v2/auth/user/authentication/authcode-for-tokens
 Content-Type: application/json
 
 {
-  "authorizationCode": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaGFtYWxhZGVlcDJAZ21haWwuY29tIiwiaWF0IjoxNzUwMDE0MjA3LCJleHAiOjE3NTAwMTQyMzcsInR5cGUiOiJhdXRoX2NvZGUifQ.Hcw9bjSqU4fzyapcn2dSYULqiDfsDmAS-Qbgno2AyRE"
+  "authorizationCode": "{{authorizationCode}}"
 }
 
-###
-POST http://localhost:8080/api/v1/auth/user/verify-otp
-Content-Type: application/json
 
-{
-  "email": "dhamaladeep@gmail.com",
-  "otp": "527391"
-}
+### Logout
+POST http://localhost:8080/api/v1/auth/user/logout
+Authorization: Bearer {{accessToken}}

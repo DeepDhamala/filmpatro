@@ -1,7 +1,7 @@
 package com.deepdhamala.filmpatro.user;
 
-import com.deepdhamala.filmpatro.auth.userAuth.Role;
-import com.deepdhamala.filmpatro.auth.userAuth.UserRegisterRequestDto;
+import com.deepdhamala.filmpatro.auth.principalUser.Role;
+import com.deepdhamala.filmpatro.auth.userRegistration.UserRegisterRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

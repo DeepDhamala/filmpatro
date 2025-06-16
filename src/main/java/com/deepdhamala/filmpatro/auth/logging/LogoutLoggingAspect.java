@@ -18,7 +18,6 @@ public class LogoutLoggingAspect {
             returning = "result")
     public void afterLogoutSuccess(JoinPoint joinPoint, Object result) {
         log.info("Logout method executed: {}", joinPoint.getSignature());
-        // Optionally process or log info from joinPoint.getArgs()
     }
 
     @AfterThrowing(

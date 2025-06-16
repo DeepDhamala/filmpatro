@@ -1,7 +1,7 @@
 package com.deepdhamala.filmpatro.user;
 
 import com.deepdhamala.filmpatro.common.AccountEntity;
-import com.deepdhamala.filmpatro.auth.userAuth.Role;
+import com.deepdhamala.filmpatro.auth.principalUser.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

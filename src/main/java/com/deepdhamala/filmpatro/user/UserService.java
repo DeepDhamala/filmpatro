@@ -1,5 +1,7 @@
 package com.deepdhamala.filmpatro.user;
 
+import com.deepdhamala.filmpatro.user.exception.UserAlreadyExistsException;
+import com.deepdhamala.filmpatro.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,4 +19,10 @@ public class UserService {
             throw new UserAlreadyExistsException("Registration Failed: Username already taken.");
         }
     }
+
+    public User getByEmailOrThrow(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+    }
+
 }

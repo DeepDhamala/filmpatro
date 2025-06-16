@@ -1,0 +1,49 @@
+package com.deepdhamala.filmpatro.auth.common;
+
+
+import com.deepdhamala.filmpatro.auth.jwt.JwtAuthenticationException;
+import com.deepdhamala.filmpatro.auth.oneTimeCode.otp.InvalidOtpException;
+import com.deepdhamala.filmpatro.common.ApiResponse;
+import com.deepdhamala.filmpatro.user.exception.UserAlreadyExistsException;
+import com.deepdhamala.filmpatro.user.exception.UserLockedException;
+import com.deepdhamala.filmpatro.user.exception.UserNotEnabledException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class AuthExceptionHandler {
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ApiResponse<String>> handleUserAlreadyExists(UserAlreadyExistsException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(HttpStatus.CONFLICT.value(), ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidOtpException.class)
+    public ResponseEntity<ApiResponse<String>> handleInvalidOtp(InvalidOtpException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
+    }
+
+    @ExceptionHandler(JwtAuthenticationException.class)
+    public ResponseEntity<ApiResponse<String>> handleJwtAuthentication(JwtAuthenticationException ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiResponse.error(HttpStatus.UNAUTHORIZED.value(), ex.getMessage()));
+    }
+    @ExceptionHandler(UserNotEnabledException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUserNotEnabled(UserNotEnabledException ex) {
+        ApiResponse<Object> response = ApiResponse.error(HttpStatus.FORBIDDEN.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+    @ExceptionHandler(UserLockedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUserLocked(UserLockedException ex) {
+        ApiResponse<Object> response = ApiResponse.error(HttpStatus.FORBIDDEN.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+}

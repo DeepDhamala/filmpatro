@@ -1,6 +1,7 @@
 package com.deepdhamala.filmpatro.auth;
 
-import com.deepdhamala.filmpatro.auth.token.TokenRepository;
+import com.deepdhamala.filmpatro.auth.token.TokenManager;
+import com.deepdhamala.filmpatro.auth.token.accessToken.AccessTokenRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LogoutService implements LogoutHandler {
 
-    private final TokenRepository tokenRepository;
+    private final AccessTokenRepository accessTokenRepository;
+    private final TokenManager tokenManager;
 
     @Override
     @Transactional
@@ -23,14 +25,12 @@ public class LogoutService implements LogoutHandler {
                        Authentication authentication) {
 
         final String jwt = extractJwt(request);
-        if (jwt == null) {
+        final String refreshToken = extractRefreshToken(request);
+
+        if (jwt == null || refreshToken == null) {
             return;
         }
-        tokenRepository.findByToken(jwt).ifPresent(storedToken -> {
-            storedToken.setExpired(true);
-            storedToken.setRevoked(true);
-            tokenRepository.save(storedToken);
-        });
+        tokenManager.revokeToken(jwt, refreshToken);
 
         SecurityContextHolder.clearContext();
     }
@@ -39,6 +39,14 @@ public class LogoutService implements LogoutHandler {
         final String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             return authHeader.substring(7);
+        }
+        return null;
+    }
+
+    private String extractRefreshToken(HttpServletRequest request) {
+        final String refreshToken = request.getHeader("Refresh-Token");
+        if (refreshToken != null && !refreshToken.isEmpty()) {
+            return refreshToken;
         }
         return null;
     }

@@ -23,7 +23,6 @@ public class CustomDaoAuthenticationProvider extends DaoAuthenticationProvider {
             throw new BadCredentialsException("Password cannot be blank");
         }
 
-        // Let DaoAuthenticationProvider continue with the normal flow
         super.additionalAuthenticationChecks(userDetails, authentication);
     }
 }
