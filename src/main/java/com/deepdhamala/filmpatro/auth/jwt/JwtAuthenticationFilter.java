@@ -1,13 +1,14 @@
 package com.deepdhamala.filmpatro.auth.jwt;
 
 
+import com.deepdhamala.filmpatro.auth.jwt.exception.JwtAuthenticationException;
+import com.deepdhamala.filmpatro.auth.jwt.exception.JwtBaseException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -49,13 +50,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String userEmail;
 
         try {
-            userEmail = jwtService.validateAndExtractUsername(jwt);
-        } catch (Exception e) {
-            log.warn("JWT authentication failed: {}", e.getMessage());
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().write(UNAUTHORIZED_MESSAGE);
-            return;
+            userEmail = jwtService.fullValidateAndExtractUsername(jwt);
+        } catch (JwtBaseException ex) {
+            throw ex;
         }
+
 
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             var userDetails = userDetailsService.loadUserByUsername(userEmail);

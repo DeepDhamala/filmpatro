@@ -3,6 +3,8 @@ package com.deepdhamala.filmpatro.auth.config;
 import com.deepdhamala.filmpatro.auth.CustomDaoAuthenticationProvider;
 import com.deepdhamala.filmpatro.auth.jwt.JwtAuthenticationFilter;
 import com.deepdhamala.filmpatro.auth.oauth2.OAuth2LoginSuccessHandler;
+import com.deepdhamala.filmpatro.common.ApiResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -64,13 +66,14 @@ public class AppSecurityConfig {
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType("application/json");
-                            response.getWriter().write("""
-                                    {
-                                      "status": 401,
-                                      "error": "Access Denied. Illegal Request attempt Recorded."
-                                    }
-                                    """);
-                        }))
+
+                            String errorMessage = authException.getMessage();
+
+                            ApiResponse<String> apiResponse = ApiResponse.error(HttpServletResponse.SC_UNAUTHORIZED, errorMessage);
+                            ObjectMapper mapper = new ObjectMapper();
+                            response.getWriter().write(mapper.writeValueAsString(apiResponse));
+                        })
+                );
         ;
         return http.build();
     }

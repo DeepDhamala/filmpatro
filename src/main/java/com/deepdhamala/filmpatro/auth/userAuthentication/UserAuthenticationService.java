@@ -31,7 +31,7 @@ public class UserAuthenticationService {
 
     public UserAuthenticationResponseDto refreshTokenForTokens(@Valid RequestTokensByRefreshTokenDto requestTokensByRefreshTokenDto) {
 
-        String userEmail = jwtService.validateAndExtractUsername(requestTokensByRefreshTokenDto.getRefreshToken());
+        String userEmail = jwtService.fullValidateAndExtractUsername(requestTokensByRefreshTokenDto.getRefreshToken());
         User user = userService.getByEmailOrThrow(userEmail);
 
         return tokenManager.issueTokens(user);

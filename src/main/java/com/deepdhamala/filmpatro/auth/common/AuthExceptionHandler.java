@@ -1,7 +1,7 @@
 package com.deepdhamala.filmpatro.auth.common;
 
 
-import com.deepdhamala.filmpatro.auth.jwt.JwtAuthenticationException;
+import com.deepdhamala.filmpatro.auth.jwt.exception.JwtAuthenticationException;
 import com.deepdhamala.filmpatro.auth.oneTimeCode.otp.InvalidOtpException;
 import com.deepdhamala.filmpatro.common.ApiResponse;
 import com.deepdhamala.filmpatro.user.exception.UserAlreadyExistsException;
@@ -35,6 +35,7 @@ public class AuthExceptionHandler {
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(ApiResponse.error(HttpStatus.UNAUTHORIZED.value(), ex.getMessage()));
     }
+
     @ExceptionHandler(UserNotEnabledException.class)
     public ResponseEntity<ApiResponse<Object>> handleUserNotEnabled(UserNotEnabledException ex) {
         ApiResponse<Object> response = ApiResponse.error(HttpStatus.FORBIDDEN.value(), ex.getMessage());
