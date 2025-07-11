@@ -5,9 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface EmailVerificationCodeRepository extends JpaRepository<EmailVerificationCode, Long> {
+public interface EmailVerificationCodeRepository extends JpaRepository<EmailVerificationCodeEntity, Long> {
 
-    Optional<EmailVerificationCode> findByUser(User user);
+    Optional<EmailVerificationCodeEntity> findByUser(User user);
 
-    Optional<EmailVerificationCode> findByEmailVerificationToken(String emailVerificationToken);
+    Optional<EmailVerificationCodeEntity> findByEmailVerificationToken(String emailVerificationToken);
 }

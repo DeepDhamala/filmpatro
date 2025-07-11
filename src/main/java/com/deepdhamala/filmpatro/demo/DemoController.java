@@ -1,6 +1,6 @@
 package com.deepdhamala.filmpatro.demo;
 
-import com.deepdhamala.filmpatro.email.EmailService;
+import com.deepdhamala.filmpatro.email.JavaMailEmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/demo")
 @RequiredArgsConstructor
 public class DemoController {
-    private final EmailService emailService;
+    private final JavaMailEmailService emailService;
 
     @RequestMapping("/hello")
     public String securedDemo(@AuthenticationPrincipal UserDetails userDetails) {

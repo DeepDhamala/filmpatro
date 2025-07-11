@@ -1,9 +1,10 @@
 package com.deepdhamala.filmpatro.auth.userRegistration;
 
-import com.deepdhamala.filmpatro.auth.oneTimeCode.emailVerificationCode.EmailVerificationCode;
+import com.deepdhamala.filmpatro.auth.oneTimeCode.emailVerificationCode.EmailVerificationCodeEntity;
 import com.deepdhamala.filmpatro.auth.oneTimeCode.emailVerificationCode.EmailVerificationCodeService;
 import com.deepdhamala.filmpatro.email.EmailDeliveryException;
-import com.deepdhamala.filmpatro.email.EmailService;
+import com.deepdhamala.filmpatro.email.JavaMailEmailService;
+import com.deepdhamala.filmpatro.email.message.EmailVerificationEmailMessage;
 import com.deepdhamala.filmpatro.user.UserMapper;
 import com.deepdhamala.filmpatro.user.UserRepository;
 import com.deepdhamala.filmpatro.user.UserService;
@@ -21,7 +22,7 @@ public class UserRegistrationService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final EmailVerificationCodeService emailVerificationCodeService;
-    private final EmailService emailService;
+    private final JavaMailEmailService emailService;
 
     @Transactional(noRollbackFor = EmailDeliveryException.class)
     public void registerNewUser(UserRegisterRequestDto userRequestRequestDto) {
@@ -32,8 +33,8 @@ public class UserRegistrationService {
 
         var savedUser = userRepository.save(user);
 
-        EmailVerificationCode emailVerificationCode = emailVerificationCodeService.issueEmailVerificationCode(savedUser);
+        var emailVerificationCode = emailVerificationCodeService.issue(savedUser);
 
-        emailService.sendEmailVerificationEmailHtml(savedUser.getEmail(), emailVerificationCode);
+        emailService.sendEmail(new EmailVerificationEmailMessage(emailVerificationCode));
     }
 }

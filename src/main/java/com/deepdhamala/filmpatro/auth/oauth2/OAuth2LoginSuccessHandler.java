@@ -1,5 +1,6 @@
 package com.deepdhamala.filmpatro.auth.oauth2;
 
+import com.deepdhamala.filmpatro.auth.oneTimeCode.authorizationCode.AuthorizationCode;
 import com.deepdhamala.filmpatro.auth.oneTimeCode.authorizationCode.AuthorizationCodeService;
 import com.deepdhamala.filmpatro.user.User;
 import jakarta.servlet.ServletException;
@@ -37,9 +38,9 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         User user = oauth2UserService.getOrCreateUser(attributes.email(), attributes.fullName(), attributes.avatarUrl());
 
-        String authCode = authorizationCodeService.issueAuthorizationCode(user);
+        AuthorizationCode authCode = authorizationCodeService.issue(user);
 
-        String redirectUrl = redirectUrlBase + "?authcode=" + authCode;
+        String redirectUrl = redirectUrlBase + "?authcode=" + authCode.getCode();
         response.sendRedirect(redirectUrl);
     }
 }

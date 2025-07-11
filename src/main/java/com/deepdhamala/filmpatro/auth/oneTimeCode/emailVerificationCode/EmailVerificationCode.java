@@ -1,29 +1,44 @@
 package com.deepdhamala.filmpatro.auth.oneTimeCode.emailVerificationCode;
 
+import com.deepdhamala.filmpatro.auth.oneTimeCode.OneTimeCode;
 import com.deepdhamala.filmpatro.auth.oneTimeCode.OneTimeCodePurpose;
-import com.deepdhamala.filmpatro.auth.common.OneTimeCodeEntity;
+import com.deepdhamala.filmpatro.auth.oneTimeCode.OneTimeCodeType;
 import com.deepdhamala.filmpatro.user.User;
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.Builder;
 
-@Data
-@SuperBuilder
-@EqualsAndHashCode(callSuper = true)
-@Entity
-@NoArgsConstructor
-@AllArgsConstructor
-public class EmailVerificationCode extends OneTimeCodeEntity {
+import java.time.Instant;
 
-    @Column(nullable = false, unique = true)
-    private String emailVerificationToken;
+@Builder
+public class EmailVerificationCode implements OneTimeCode<EmailVerificationCode> {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    private String code;
+    private OneTimeCodeType type;
+    private OneTimeCodePurpose purpose;
+    private Instant expiresAt;
     private User user;
 
     @Override
-    public OneTimeCodePurpose getOneTimeCodePurpose() {
+    public String getCode() {
+        return this.code;
+    }
+
+    @Override
+    public OneTimeCodeType getType() {
+        return this.type;
+    }
+
+    @Override
+    public OneTimeCodePurpose getPurpose() {
         return OneTimeCodePurpose.EMAIL_VERIFICATION;
+    }
+
+    @Override
+    public Instant getExpiresAt() {
+        return this.expiresAt;
+    }
+
+    @Override
+    public User getUser() {
+        return this.user;
     }
 }

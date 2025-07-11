@@ -13,8 +13,8 @@ public class AuthorizationCodeValidator {
 
     private final AuthorizationCodeRepository authorizationCodeRepository;
 
-    public AuthorizationCode validateAndGet(String authCode) {
-        AuthorizationCode code = authorizationCodeRepository.findByAuthorizationCode(authCode)
+    public AuthorizationCodeEntity validateAndGet(String authCode) {
+        AuthorizationCodeEntity code = authorizationCodeRepository.findByAuthorizationCode(authCode)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Authorization code not found"));
 
         if (code.isUsed()) {

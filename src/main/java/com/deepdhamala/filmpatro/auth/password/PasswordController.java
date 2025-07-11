@@ -1,6 +1,6 @@
 package com.deepdhamala.filmpatro.auth.password;
 
-import com.deepdhamala.filmpatro.auth.oneTimeCode.forgetPasswordResetCode.ForgetPasswordResetCodeService;
+import com.deepdhamala.filmpatro.auth.oneTimeCode.forgetPasswordResetCode.ForgetPasswordRecoveryService;
 import com.deepdhamala.filmpatro.auth.oneTimeCode.forgetPasswordResetCode.ForgetPasswordResetRequestDto;
 import com.deepdhamala.filmpatro.auth.oneTimeCode.forgetPasswordResetCode.ForgotPasswordRequestDto;
 import com.deepdhamala.filmpatro.common.ApiResponse;
@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PasswordController {
 
     private final PasswordService passwordService;
-    private final ForgetPasswordResetCodeService forgetPasswordResetCodeService;
+    private final ForgetPasswordRecoveryService forgetPasswordResetCodeService;
 
     @PostMapping("/change")
     public ResponseEntity<ApiResponse<String>> changePassword(
@@ -30,14 +30,14 @@ public class PasswordController {
     @PostMapping("/forgot")
     public ResponseEntity<ApiResponse<String>> forgotPassword(
             @RequestBody @Valid ForgotPasswordRequestDto forgotPasswordRequestDto) {
-        forgetPasswordResetCodeService.recoverForgetPassword(forgotPasswordRequestDto);
+        forgetPasswordResetCodeService.sendForgetPasswordRecoveryEmail(forgotPasswordRequestDto);
         return ResponseEntity.ok(ApiResponse.success(null, "Forgot password request processed successfully"));
     }
 
     @PostMapping("/reset")
     public ResponseEntity<ApiResponse<String>> resetForgotPassword(
             @RequestBody @Valid ForgetPasswordResetRequestDto forgetPasswordResetCodeDto) {
-        forgetPasswordResetCodeService.resetForgetPassword(forgetPasswordResetCodeDto);
+        forgetPasswordResetCodeService.resetForgottenPassword(forgetPasswordResetCodeDto);
         return ResponseEntity.ok(ApiResponse.success(null, "Forgot password reset successfully"));
     }
 }

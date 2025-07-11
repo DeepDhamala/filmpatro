@@ -1,0 +1,5 @@
+package com.deepdhamala.filmpatro.film.media;
+
+public enum MediaType {
+    POSTER, IMAGE, TRAILER, CLIP, BACKDROP, LOGO, BANNER, THUMBNAIL, AUDIO, VIDEO, DOCUMENTARY, INTERVIEW, BEHIND_THE_SCENES, FEATURETTE, PROMOTIONAL
+}

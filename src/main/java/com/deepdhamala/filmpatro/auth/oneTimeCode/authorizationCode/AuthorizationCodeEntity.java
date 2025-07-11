@@ -1,4 +1,4 @@
-package com.deepdhamala.filmpatro.auth.oneTimeCode.forgetPasswordResetCode;
+package com.deepdhamala.filmpatro.auth.oneTimeCode.authorizationCode;
 
 import com.deepdhamala.filmpatro.auth.oneTimeCode.OneTimeCodePurpose;
 import com.deepdhamala.filmpatro.auth.common.OneTimeCodeEntity;
@@ -16,17 +16,18 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ForgetPasswordResetCode extends OneTimeCodeEntity {
+public class AuthorizationCodeEntity extends OneTimeCodeEntity {
 
-    @Column(nullable = false, unique = true)
-    private String forgetPasswordResetCode;
+    @Column(unique = true)
+    private String authorizationCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
+
     @Override
     public OneTimeCodePurpose getOneTimeCodePurpose() {
-        return OneTimeCodePurpose.FORGET_PASSWORD_RESET;
+        return OneTimeCodePurpose.AUTHORIZATION_CODE;
     }
 }

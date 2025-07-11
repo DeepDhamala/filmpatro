@@ -1,6 +1,10 @@
 package com.deepdhamala.filmpatro.auth.oneTimeCode.authorizationCode;
 
+import com.deepdhamala.filmpatro.auth.oneTimeCode.OneTimeCodePurpose;
+import com.deepdhamala.filmpatro.auth.oneTimeCode.OneTimeCodeService;
 import com.deepdhamala.filmpatro.auth.oneTimeCode.OneTimeCodeType;
+import com.deepdhamala.filmpatro.auth.oneTimeCode.emailVerificationCode.EmailVerificationCode;
+import com.deepdhamala.filmpatro.auth.oneTimeCode.emailVerificationCode.EmailVerificationCodeEntity;
 import com.deepdhamala.filmpatro.auth.token.TokenManager;
 import com.deepdhamala.filmpatro.auth.userAuthentication.UserAuthenticationResponseDto;
 import com.deepdhamala.filmpatro.user.User;
@@ -14,36 +18,57 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class AuthorizationCodeService {
+public class AuthorizationCodeService implements OneTimeCodeService<AuthorizationCode> {
 
     private final AuthorizationCodeRepository authorizationCodeRepository;
     private final TokenManager tokenManager;
     private final AuthorizationCodeValidator authorizationCodeValidator;
 
-    @Transactional
-    public String issueAuthorizationCode(User user) {
 
-        String authCode = UUID.randomUUID().toString();
-        Instant expiresAt = Instant.now().plusSeconds(20);
+    @Override
+    public AuthorizationCode generate(User user) {
 
-        AuthorizationCode authorizationCode = AuthorizationCode.builder()
-                .authorizationCode(authCode)
+        String code = UUID.randomUUID().toString();
+
+        Instant expiresAt = Instant.now().plusSeconds(15); // 15 seconds
+
+        return AuthorizationCode.builder()
                 .user(user)
+                .code(code)
+                .type(OneTimeCodeType.UUID)
+                .purpose(OneTimeCodePurpose.EMAIL_VERIFICATION)
                 .expiresAt(expiresAt)
-                .codeType(OneTimeCodeType.UUID)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public AuthorizationCode save(AuthorizationCode oneTimeCode) {
+
+        AuthorizationCodeEntity emailVerificationCodeEntity = AuthorizationCodeEntity.builder()
+                .authorizationCode(oneTimeCode.getCode())
+                .codeType(oneTimeCode.getType())
+                .user(oneTimeCode.getUser())
+                .expiresAt(oneTimeCode.getExpiresAt())
                 .build();
 
-        authorizationCodeRepository.save(authorizationCode);
+        authorizationCodeRepository.save(emailVerificationCodeEntity);
 
-        return authCode;
+        return oneTimeCode;
+    }
 
+    @Override
+    @Transactional
+    public AuthorizationCode issue(User user) {
+        AuthorizationCode oneTimeCode = generate(user);
+        return save(oneTimeCode);
     }
 
     @Transactional
     public UserAuthenticationResponseDto exchangeAuthCodeForTokens(@Valid AuthorizationCodeForTokenDto authorizationCodeForTokenDto) {
 
         String authCode = authorizationCodeForTokenDto.getAuthorizationCode();
-        AuthorizationCode authorizationCode = authorizationCodeValidator.validateAndGet(authCode);
+        AuthorizationCodeEntity authorizationCode = authorizationCodeValidator.validateAndGet(authCode);
 
         authorizationCode.setUsed(true);
 

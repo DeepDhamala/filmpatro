@@ -13,9 +13,9 @@ public class ForgetPasswordResetCodeValidator {
 
     private final ForgetPasswordResetCodeRepository forgetPasswordResetCodeRepository;
 
-    public ForgetPasswordResetCode validateAndGet(String code) {
+    public ForgetPasswordRecoveryCodeEntity validateAndGet(String code) {
 
-        ForgetPasswordResetCode forgetPasswordResetCode = forgetPasswordResetCodeRepository
+        ForgetPasswordRecoveryCodeEntity forgetPasswordResetCode = forgetPasswordResetCodeRepository
                 .findByForgetPasswordResetCode(code)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid or expired token"));
 

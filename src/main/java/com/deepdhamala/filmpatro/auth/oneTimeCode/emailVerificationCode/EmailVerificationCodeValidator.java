@@ -6,15 +6,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
 public class EmailVerificationCodeValidator {
     private final EmailVerificationCodeRepository emailVerificationCodeRepository;
 
-    public EmailVerificationCode validateAndGet(String token) {
-        EmailVerificationCode verificationToken = emailVerificationCodeRepository.findByEmailVerificationToken(token)
+    public EmailVerificationCodeEntity validateAndGet(String token) {
+        EmailVerificationCodeEntity verificationToken = emailVerificationCodeRepository.findByEmailVerificationToken(token)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid verification token"));
 
         if (verificationToken.isUsed()) {

@@ -1,4 +1,4 @@
-package com.deepdhamala.filmpatro.auth.oneTimeCode.authorizationCode;
+package com.deepdhamala.filmpatro.auth.oneTimeCode.forgetPasswordResetCode;
 
 import com.deepdhamala.filmpatro.auth.oneTimeCode.OneTimeCode;
 import com.deepdhamala.filmpatro.auth.oneTimeCode.OneTimeCodePurpose;
@@ -9,7 +9,7 @@ import lombok.Builder;
 import java.time.Instant;
 
 @Builder
-public class AuthorizationCode implements OneTimeCode<AuthorizationCode> {
+public class ForgetPasswordRecoveryCode implements OneTimeCode<ForgetPasswordRecoveryCode> {
 
     private String code;
     private OneTimeCodeType type;
@@ -29,7 +29,7 @@ public class AuthorizationCode implements OneTimeCode<AuthorizationCode> {
 
     @Override
     public OneTimeCodePurpose getPurpose() {
-        return OneTimeCodePurpose.AUTHORIZATION_CODE;
+        return OneTimeCodePurpose.FORGET_PASSWORD_RESET;
     }
 
     @Override
