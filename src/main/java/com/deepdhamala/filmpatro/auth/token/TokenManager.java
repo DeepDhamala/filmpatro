@@ -7,6 +7,7 @@ import com.deepdhamala.filmpatro.auth.userAuthentication.UserAuthenticationRespo
 import com.deepdhamala.filmpatro.auth.principalUser.UserPrincipal;
 import com.deepdhamala.filmpatro.user.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,6 +18,16 @@ public class TokenManager {
     private final RefreshTokenService refreshTokenService;
     private final JwtService jwtService;
 
+    public Tokens saveAccessAndRefreshTokens(Tokens tokens) {
+        accessTokenService.saveAccessToken(tokens.getAccessToken());
+        refreshTokenService.saveRefreshToken(tokens.getRefreshToken());
+        return tokens;
+    }
+
+    /**
+     * @deprecated Use {@link #saveAccessAndRefreshTokens(Tokens)} instead.
+     */
+    @Deprecated
     public void saveAccessAndRefreshTokens(User user, String accessToken, String refreshToken) {
         accessTokenService.saveAccessToken(user, accessToken);
         refreshTokenService.saveRefreshToken(user, refreshToken);

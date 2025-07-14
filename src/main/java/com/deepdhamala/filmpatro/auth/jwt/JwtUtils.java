@@ -19,6 +19,18 @@ public class JwtUtils {
         // Private constructor to prevent instantiation
     }
 
+    public static String generateJwtToken(JwtTokenRequest jwtTokenRequest) {
+        return Jwts
+                .builder()
+                .claims(jwtTokenRequest.getExtraClaims())
+                .subject(jwtTokenRequest.getSubject())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + jwtTokenRequest.getExpiration()))
+                .signWith(jwtTokenRequest.getSecretKey(), Jwts.SIG.HS256)
+                .compact();
+    }
+
+    @Deprecated
     public static String generateAccessToken(Map<String, Object> extraClaims, String subject, long expirationMillis, SecretKey secretKey) {
         return Jwts
                 .builder()

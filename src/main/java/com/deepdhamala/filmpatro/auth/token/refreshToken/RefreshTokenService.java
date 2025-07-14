@@ -16,11 +16,24 @@ public class RefreshTokenService {
     private final JwtService jwtService;
     private final RefreshTokenRepository refreshTokenRepository;
 
+    public void saveRefreshToken(RefreshToken refreshToken) {
+        Date expiryDate = jwtService.extractExpiration(refreshToken.getRefreshToken());
+
+        RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.builder()
+                .user(refreshToken.getUser())
+                .refreshToken(refreshToken.getRefreshToken())
+                .expiresAt(expiryDate.toInstant())
+                .tokenType(TokenType.BEARER)
+                .build();
+
+        refreshTokenRepository.save(refreshTokenEntity);
+    }
+
     public void saveRefreshToken(User user, String refreshToken) {
 
         Date expiryDate = jwtService.extractExpiration(refreshToken);
 
-        RefreshToken refreshTokenEntity = RefreshToken.builder()
+        RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.builder()
                 .user(user)
                 .refreshToken(refreshToken)
                 .expiresAt(expiryDate.toInstant())

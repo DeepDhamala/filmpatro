@@ -16,11 +16,25 @@ public class AccessTokenService {
     private final AccessTokenRepository accessTokenRepository;
     private final JwtService jwtService;
 
+    public void saveAccessToken(AccessToken accessToken) {
+
+        Date expiryDate = jwtService.extractExpiration(accessToken.getAccessToken());
+
+        AccessTokenEntity accessTokenEntity = AccessTokenEntity.builder()
+                .user(accessToken.getUser())
+                .accessToken(accessToken.getAccessToken())
+                .expiresAt(expiryDate.toInstant())
+                .tokenType(TokenType.BEARER)
+                .build();
+
+        accessTokenRepository.save(accessTokenEntity);
+    }
+
     public void saveAccessToken(User user, String accessToken) {
 
         Date expiryDate = jwtService.extractExpiration(accessToken);
 
-        AccessToken accessTokenEntity = AccessToken.builder()
+        AccessTokenEntity accessTokenEntity = AccessTokenEntity.builder()
                 .user(user)
                 .accessToken(accessToken)
                 .expiresAt(expiryDate.toInstant())

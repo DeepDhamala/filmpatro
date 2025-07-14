@@ -1,30 +1,26 @@
 package com.deepdhamala.filmpatro.auth.token.refreshToken;
 
+import com.deepdhamala.filmpatro.auth.token.Token;
 import com.deepdhamala.filmpatro.auth.token.TokenPurpose;
-import com.deepdhamala.filmpatro.auth.common.TokenEntity;
 import com.deepdhamala.filmpatro.user.User;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
-@Entity
-@Data
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder
 @AllArgsConstructor
-@NoArgsConstructor
-public class RefreshToken extends TokenEntity {
+public class RefreshToken implements Token {
 
-    @Column(unique = true)
-    private String refreshToken;
+    private String token;
+    private User belongsTo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Override
+    public String getToken() {
+        return this.token;
+    }
 
+    @Override
+    public User getUser() {
+        return this.belongsTo;
+    }
 
     @Override
     public TokenPurpose getTokenPurpose() {

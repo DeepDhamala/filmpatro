@@ -6,16 +6,16 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface AccessTokenRepository extends JpaRepository<AccessToken, Integer> {
+public interface AccessTokenRepository extends JpaRepository<AccessTokenEntity, Integer> {
     @Query(value= """
-            select t from AccessToken
+            select t from AccessTokenEntity
             t inner join User u
             on t.user.id = u.id
             where u.id = :id and (t.expired = false or t.revoked = false)
             """)
-    List<AccessToken> findAllValidAccessTokenByUser(Long id);
+    List<AccessTokenEntity> findAllValidAccessTokenByUser(Long id);
 
-    Optional<AccessToken> findByAccessToken(String token);
+    Optional<AccessTokenEntity> findByAccessToken(String token);
 
 //    Optional<Token> findByAuthCodeForTokens(String authCodeForTokens);
 }
