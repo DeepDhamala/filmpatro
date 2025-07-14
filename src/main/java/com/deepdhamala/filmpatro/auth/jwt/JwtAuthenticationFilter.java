@@ -1,7 +1,6 @@
 package com.deepdhamala.filmpatro.auth.jwt;
 
 
-import com.deepdhamala.filmpatro.auth.jwt.exception.JwtAuthenticationException;
 import com.deepdhamala.filmpatro.auth.jwt.exception.JwtBaseException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
