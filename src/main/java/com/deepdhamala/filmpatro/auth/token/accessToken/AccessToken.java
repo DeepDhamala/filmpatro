@@ -5,9 +5,11 @@ import com.deepdhamala.filmpatro.auth.token.TokenPurpose;
 import com.deepdhamala.filmpatro.auth.token.TokenType;
 import com.deepdhamala.filmpatro.user.User;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @AllArgsConstructor
+@Builder
 public class AccessToken implements Token {
 
     private String token;

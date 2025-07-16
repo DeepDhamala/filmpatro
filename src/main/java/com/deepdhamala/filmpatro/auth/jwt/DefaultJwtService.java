@@ -23,7 +23,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DefaultJwtService implements JwtService {
+public class DefaultJwtService implements IJwtService {
 
     private final JwtProperties jwtProperties;
     private SecretKey secretKey;

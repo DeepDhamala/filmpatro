@@ -3,10 +3,8 @@ package com.deepdhamala.filmpatro.auth.oneTimeCode.authorizationCode;
 import com.deepdhamala.filmpatro.auth.oneTimeCode.OneTimeCodePurpose;
 import com.deepdhamala.filmpatro.auth.oneTimeCode.OneTimeCodeService;
 import com.deepdhamala.filmpatro.auth.oneTimeCode.OneTimeCodeType;
-import com.deepdhamala.filmpatro.auth.oneTimeCode.emailVerificationCode.EmailVerificationCode;
-import com.deepdhamala.filmpatro.auth.oneTimeCode.emailVerificationCode.EmailVerificationCodeEntity;
 import com.deepdhamala.filmpatro.auth.token.TokenManager;
-import com.deepdhamala.filmpatro.auth.userAuthentication.UserAuthenticationResponseDto;
+import com.deepdhamala.filmpatro.auth.userAuthentication.AccessRefreshTokenResponseDto;
 import com.deepdhamala.filmpatro.user.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +63,7 @@ public class AuthorizationCodeService implements OneTimeCodeService<Authorizatio
     }
 
     @Transactional
-    public UserAuthenticationResponseDto exchangeAuthCodeForTokens(@Valid AuthorizationCodeForTokenDto authorizationCodeForTokenDto) {
+    public AccessRefreshTokenResponseDto exchangeAuthCodeForTokens(@Valid AuthorizationCodeForTokenDto authorizationCodeForTokenDto) {
 
         String authCode = authorizationCodeForTokenDto.getAuthorizationCode();
         AuthorizationCodeEntity authorizationCode = authorizationCodeValidator.validateAndGet(authCode);

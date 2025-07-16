@@ -16,27 +16,28 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class UserAuthenticationController {
 
-    private final UserAuthenticationService userAuthenticationService;
+    private final UserAuthenticationService<UsernamePasswordRequestDto, AccessRefreshTokenResponseDto> userAuthenticationService;
+    private final DefaultAuthenticationService defaultAuthenticationService;
     private final AuthorizationCodeService authorizationCodeService;
 
     @PostMapping("/authenticate")
-    public ResponseEntity<ApiResponse<UserAuthenticationResponseDto>> authenticateUser(
+    public ResponseEntity<ApiResponse<AccessRefreshTokenResponseDto>> authenticateUser(
             @RequestBody @Valid AuthenticationRequestDto authenticationRequestDto) {
-        var authResponse = userAuthenticationService.authenticateUser(authenticationRequestDto);
+        var authResponse = defaultAuthenticationService.authenticateUser(authenticationRequestDto);
         return ResponseEntity.ok(ApiResponse.success(authResponse, "Authentication successful!"));
     }
 
     @PostMapping("/refreshtoken-for-tokens")
-    public ResponseEntity<ApiResponse<UserAuthenticationResponseDto>> refreshTokenForTokens(
+    public ResponseEntity<ApiResponse<AccessRefreshTokenResponseDto>> refreshTokenForTokens(
             @RequestBody @Valid RequestTokensByRefreshTokenDto requestTokensByRefreshTokenDto) {
-        var refreshResponse = userAuthenticationService.refreshTokenForTokens(requestTokensByRefreshTokenDto);
+        var refreshResponse = defaultAuthenticationService.refreshTokenForTokens(requestTokensByRefreshTokenDto);
         return ResponseEntity.ok(ApiResponse.success(refreshResponse, "Tokens refreshed successfully"));
     }
 
     @PostMapping("/authcode-for-tokens")
-    public ResponseEntity<ApiResponse<UserAuthenticationResponseDto>> exchangeAuthCodeForTokens(
+    public ResponseEntity<ApiResponse<AccessRefreshTokenResponseDto>> exchangeAuthCodeForTokens(
             @RequestBody @Valid AuthorizationCodeForTokenDto authorizationCodeForTokenDto) {
-        UserAuthenticationResponseDto exchangeResponse = authorizationCodeService.exchangeAuthCodeForTokens(authorizationCodeForTokenDto);
+        AccessRefreshTokenResponseDto exchangeResponse = authorizationCodeService.exchangeAuthCodeForTokens(authorizationCodeForTokenDto);
         return ResponseEntity.ok(ApiResponse.success(exchangeResponse, "Tokens exchanged successfully"));
     }
 

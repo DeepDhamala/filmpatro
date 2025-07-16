@@ -1,6 +1,7 @@
 package com.deepdhamala.filmpatro.auth.token.refreshToken;
 
-import com.deepdhamala.filmpatro.auth.jwt.JwtService;
+import com.deepdhamala.filmpatro.auth.jwt.IJwtService;
+import com.deepdhamala.filmpatro.auth.token.Token;
 import com.deepdhamala.filmpatro.auth.token.TokenType;
 import com.deepdhamala.filmpatro.user.User;
 import lombok.RequiredArgsConstructor;
@@ -13,15 +14,33 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class RefreshTokenService {
 
-    private final JwtService jwtService;
+    private final IJwtService jwtService;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public void saveRefreshToken(RefreshToken refreshToken) {
-        Date expiryDate = jwtService.extractExpiration(refreshToken.getRefreshToken());
+    @Transactional
+    public void saveRefreshToken(Token refreshToken) {
+        Date expiryDate = jwtService.extractExpiration(refreshToken.getToken());
 
         RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.builder()
                 .user(refreshToken.getUser())
-                .refreshToken(refreshToken.getRefreshToken())
+                .refreshToken(refreshToken.getToken())
+                .expiresAt(expiryDate.toInstant())
+                .tokenType(TokenType.BEARER)
+                .build();
+
+        refreshTokenRepository.save(refreshTokenEntity);
+    }
+
+    /**
+     * @deprecated Use {@link #saveRefreshToken(Token)} instead.
+     */
+    @Deprecated
+    public void saveRefreshToken(RefreshToken refreshToken) {
+        Date expiryDate = jwtService.extractExpiration(refreshToken.getToken());
+
+        RefreshTokenEntity refreshTokenEntity = RefreshTokenEntity.builder()
+                .user(refreshToken.getUser())
+                .refreshToken(refreshToken.getToken())
                 .expiresAt(expiryDate.toInstant())
                 .tokenType(TokenType.BEARER)
                 .build();

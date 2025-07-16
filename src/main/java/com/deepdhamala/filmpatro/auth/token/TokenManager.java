@@ -1,13 +1,13 @@
 package com.deepdhamala.filmpatro.auth.token;
 
+import com.deepdhamala.filmpatro.auth.jwt.IJwtService;
 import com.deepdhamala.filmpatro.auth.jwt.JwtService;
 import com.deepdhamala.filmpatro.auth.token.accessToken.AccessTokenService;
 import com.deepdhamala.filmpatro.auth.token.refreshToken.RefreshTokenService;
-import com.deepdhamala.filmpatro.auth.userAuthentication.UserAuthenticationResponseDto;
+import com.deepdhamala.filmpatro.auth.userAuthentication.AccessRefreshTokenResponseDto;
 import com.deepdhamala.filmpatro.auth.principalUser.UserPrincipal;
 import com.deepdhamala.filmpatro.user.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,13 +16,15 @@ public class TokenManager {
 
     private final AccessTokenService accessTokenService;
     private final RefreshTokenService refreshTokenService;
-    private final JwtService jwtService;
+    private final IJwtService jwtService;
+    private final JwtService jwtService2;
 
     public Tokens saveAccessAndRefreshTokens(Tokens tokens) {
-        accessTokenService.saveAccessToken(tokens.getAccessToken());
+        accessTokenService.saveToken(tokens.getAccessToken());
         refreshTokenService.saveRefreshToken(tokens.getRefreshToken());
         return tokens;
     }
+
 
     /**
      * @deprecated Use {@link #saveAccessAndRefreshTokens(Tokens)} instead.
@@ -33,7 +35,12 @@ public class TokenManager {
         refreshTokenService.saveRefreshToken(user, refreshToken);
     }
 
-    public UserAuthenticationResponseDto issueTokens(User user) {
+//    public Tokens issueTokens(UserDetails userDetails) {
+//        jwtService2.generateTokens
+//    }
+
+    @Deprecated
+    public AccessRefreshTokenResponseDto issueTokens(User user) {
 
         UserPrincipal userPrincipal = UserPrincipal.builder().user(user).build();
 
@@ -42,7 +49,7 @@ public class TokenManager {
 
         saveAccessAndRefreshTokens(user, jwtToken, refreshToken);
 
-        return UserAuthenticationResponseDto.builder()
+        return AccessRefreshTokenResponseDto.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
                 .build();

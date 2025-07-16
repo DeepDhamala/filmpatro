@@ -1,30 +1,22 @@
 package com.deepdhamala.filmpatro.auth.jwt;
 
+import com.deepdhamala.filmpatro.auth.token.Token;
+import io.jsonwebtoken.Claims;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.crypto.SecretKey;
-import java.util.Map;
+import java.util.function.Function;
 
 @NoArgsConstructor
-public abstract class AbstractJwtService implements JwtService2 {
+public abstract class AbstractJwtService implements JwtService {
 
     @Override
-    public String generateToken(JwtTokenRequest jwtTokenRequest) {
+    public Token generateToken(JwtTokenRequest jwtTokenRequest) {
         return generateTokenInternal(jwtTokenRequest);
     }
 
     @Override
-    public <T> T extractClaim(String token, String claimName, Class<T> claimType) {
-        return null;
-    }
+    public abstract <T> T extractClaim(Token token, Function<Claims, T> claimsResolver);
 
-
-    protected String generateRefreshToken(JwtTokenRequest jwtTokenRequest){
-//        jwtTokenRequest.("refresh");
-        return generateToken(jwtTokenRequest);
-    }
-
-    protected abstract String generateTokenInternal(JwtTokenRequest jwtTokenRequest);
+    protected abstract Token generateTokenInternal(JwtTokenRequest jwtTokenRequest);
 
 }

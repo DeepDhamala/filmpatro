@@ -1,6 +1,7 @@
 package com.deepdhamala.filmpatro.auth.token.accessToken;
 
-import com.deepdhamala.filmpatro.auth.jwt.JwtService;
+import com.deepdhamala.filmpatro.auth.jwt.IJwtService;
+import com.deepdhamala.filmpatro.auth.token.Token;
 import com.deepdhamala.filmpatro.auth.token.TokenType;
 import com.deepdhamala.filmpatro.user.User;
 import lombok.RequiredArgsConstructor;
@@ -14,15 +15,35 @@ import java.util.Date;
 public class AccessTokenService {
 
     private final AccessTokenRepository accessTokenRepository;
-    private final JwtService jwtService;
+    private final IJwtService jwtService;
 
+    @Transactional
+    public Token saveToken(Token token) {
+        Date expiryDate = jwtService.extractExpiration(token.getToken());
+
+        AccessTokenEntity accessTokenEntity = AccessTokenEntity.builder()
+                .user(token.getUser())
+                .accessToken(token.getToken())
+                .expiresAt(expiryDate.toInstant())
+                .tokenType(TokenType.BEARER)
+                .build();
+
+        accessTokenRepository.save(accessTokenEntity);
+
+        return token;
+    }
+
+    /**
+     * @deprecated Use {@link #saveToken(Token)} instead.
+     */
+    @Deprecated
     public void saveAccessToken(AccessToken accessToken) {
 
-        Date expiryDate = jwtService.extractExpiration(accessToken.getAccessToken());
+        Date expiryDate = jwtService.extractExpiration(accessToken.getToken());
 
         AccessTokenEntity accessTokenEntity = AccessTokenEntity.builder()
                 .user(accessToken.getUser())
-                .accessToken(accessToken.getAccessToken())
+                .accessToken(accessToken.getToken())
                 .expiresAt(expiryDate.toInstant())
                 .tokenType(TokenType.BEARER)
                 .build();

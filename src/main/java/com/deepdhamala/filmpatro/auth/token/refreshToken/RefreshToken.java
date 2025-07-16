@@ -4,9 +4,11 @@ import com.deepdhamala.filmpatro.auth.token.Token;
 import com.deepdhamala.filmpatro.auth.token.TokenPurpose;
 import com.deepdhamala.filmpatro.user.User;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 @AllArgsConstructor
+@Builder
 public class RefreshToken implements Token {
 
     private String token;

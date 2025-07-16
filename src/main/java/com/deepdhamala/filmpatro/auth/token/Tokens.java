@@ -9,7 +9,7 @@ import lombok.Data;
 @Builder
 public class Tokens {
 
-    private AccessToken accessToken;
-    private RefreshToken refreshToken;
+    private Token accessToken;
+    private Token refreshToken;
 
 }

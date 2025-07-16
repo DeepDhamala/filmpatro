@@ -1,38 +1,14 @@
 package com.deepdhamala.filmpatro.auth.jwt;
 
-import jakarta.annotation.PostConstruct;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.deepdhamala.filmpatro.auth.token.Token;
+import io.jsonwebtoken.Claims;
 
-import java.util.Date;
-import java.util.Map;
+import java.util.function.Function;
 
-public interface JwtService {
-    @PostConstruct
-    void init();
+public interface JwtService extends ExtendedJwtService {
 
-    String generateUserResourceAccessToken(UserDetails userDetails);
+    Token generateToken(JwtTokenRequest jwtTokenRequest);
+    <T> T extractClaim(Token token, Function<Claims, T> claimsResolver);
+    boolean isTokenValid(Token token);
 
-    String generateUserResourceAccessToken(
-            Map<String, Object> extraClaims,
-            UserDetails userDetails
-    );
-
-    String generateUserResourceAccessToken(
-            Map<String, Object> extraClaims,
-            @NotNull UserDetails userDetails,
-            long expiration
-    );
-
-    String generateRefreshToken(
-            UserDetails userDetails
-    );
-
-    String extractUsernameFromJwt(String token);
-
-    Date extractExpiration(String token);
-
-    boolean isTokenValidInDb(String token);
-
-    String fullValidateAndExtractUsername(String token);
 }
