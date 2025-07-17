@@ -23,7 +23,7 @@ public class EmailVerificationEmailMessage implements EmailMessage<EmailVerifica
 
     @Override
     public String getHtmlContent() {
-        String verificationLink = "http://localhost:8080/api/v1/auth/user/verify-email?verificationCode="
+        String verificationLink = "http://localhost:8080/api/v1/auth/user/registration/verify-email?verificationCode="
                 + emailVerificationCode.getCode();
 
         return """

@@ -7,6 +7,7 @@ import com.deepdhamala.filmpatro.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,14 @@ public class UserAuthenticationService {
 
     public UserAuthenticationResponseDto authenticateUser(@Valid AuthenticationRequestDto authenticationRequestDto) {
 
-        authenticateCredentials(authenticationRequestDto);
+        try {
+            authenticateCredentials(authenticationRequestDto);
+        } catch (DisabledException ex) {
+            throw new UserDisabledException(
+                    "Email not verified! Please verify your email to continue. " +
+                            "Hint: Check your registered email for a verification email."
+            );
+        }
 
         User user = userService.getByEmailOrThrow(authenticationRequestDto.getEmail());
 

@@ -3,6 +3,7 @@ package com.deepdhamala.filmpatro.auth.common;
 
 import com.deepdhamala.filmpatro.auth.jwt.exception.JwtAuthenticationException;
 import com.deepdhamala.filmpatro.auth.oneTimeCode.otp.InvalidOtpException;
+import com.deepdhamala.filmpatro.auth.userAuthentication.UserDisabledException;
 import com.deepdhamala.filmpatro.common.ApiResponse;
 import com.deepdhamala.filmpatro.user.exception.UserAlreadyExistsException;
 import com.deepdhamala.filmpatro.user.exception.UserLockedException;
@@ -46,5 +47,12 @@ public class AuthExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleUserLocked(UserLockedException ex) {
         ApiResponse<Object> response = ApiResponse.error(HttpStatus.FORBIDDEN.value(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
+    @ExceptionHandler(UserDisabledException.class)
+    public ResponseEntity<ApiResponse<String>> handleUserDisabled(UserDisabledException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiResponse.error(HttpStatus.FORBIDDEN.value(), ex.getMessage()));
     }
 }

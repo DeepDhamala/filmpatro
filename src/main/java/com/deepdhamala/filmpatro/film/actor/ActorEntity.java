@@ -2,7 +2,7 @@ package com.deepdhamala.filmpatro.film.actor;
 
 
 import com.deepdhamala.filmpatro.common.AuditableEntity;
-import com.deepdhamala.filmpatro.film.movie.Movie;
+import com.deepdhamala.filmpatro.film.movie.MovieEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,9 +18,9 @@ import java.util.Set;
 @NoArgsConstructor
 @SuperBuilder
 @Entity
-@Table(name = "genres")
+@Table(name = "actors")
 @Audited
-public class Actor extends AuditableEntity {
+public class ActorEntity extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +29,9 @@ public class Actor extends AuditableEntity {
     @Column(nullable = false)
     private String name;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     @ManyToMany(mappedBy = "actors")
-    private Set<Movie> movies = new HashSet<>();
+    private Set<MovieEntity> movies = new HashSet<>();
 }

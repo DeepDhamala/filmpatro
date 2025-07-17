@@ -2,7 +2,7 @@ package com.deepdhamala.filmpatro.film.genre;
 
 
 import com.deepdhamala.filmpatro.common.AuditableEntity;
-import com.deepdhamala.filmpatro.film.movie.Movie;
+import com.deepdhamala.filmpatro.film.movie.MovieEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,11 +20,11 @@ import java.util.Set;
 @Entity
 @Table(name = "genres")
 @Audited
-public class Genre extends AuditableEntity {
+public class GenreEntity extends AuditableEntity {
 
     @Column(nullable = false, unique = true)
     private String name;
 
     @ManyToMany(mappedBy = "genres")
-    private Set<Movie> movies = new HashSet<>();
+    private Set<MovieEntity> movies = new HashSet<>();
 }

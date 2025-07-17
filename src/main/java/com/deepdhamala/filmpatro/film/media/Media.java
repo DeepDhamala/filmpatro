@@ -1,7 +1,7 @@
 package com.deepdhamala.filmpatro.film.media;
 
 import com.deepdhamala.filmpatro.common.AuditableEntity;
-import com.deepdhamala.filmpatro.film.movie.Movie;
+import com.deepdhamala.filmpatro.film.movie.MovieEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -17,9 +17,15 @@ import org.hibernate.envers.Audited;
 @SuperBuilder
 public class Media extends AuditableEntity {
 
+    public Media(String url, MovieEntity movie, MediaType type) {
+        this.url = url;
+        this.movie = movie;
+        this.type = type;
+    }
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "movie_id", nullable = false)
-    private Movie movie;
+    private MovieEntity movie;
 
     @Column(nullable = false)
     private String url;

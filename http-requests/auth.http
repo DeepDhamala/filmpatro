@@ -1,17 +1,18 @@
 ### User Registration
-POST http://localhost:8080/api/v2/auth/user/registration/register
+POST http://localhost:8080/api/v1/auth/user/registration/register
 Content-Type: application/json
 
 {
   "email": "dhamaladeep@gmail.com",
   "password": "Deep@1234",
   "confirmPassword": "Deep@1234",
-  "username": "deep"
+  "username": "deep2"
 }
 
 
-### Email Verification After User Registration
-GET http://localhost:8080/api/v2/auth/user/registration/verify-email?verificationCode={{verificationCode}}
+### Verify Email after Registration
+GET http://localhost:8080/api/v1/auth/user/registration/verify-email?verificationCode=89165e0b-0040-4d07-98f0-c48d0e7ebbef
+
 
 
 ### User Authentication (Login)
@@ -22,6 +23,11 @@ Content-Type: application/json
   "email": "dhamaladeep@gmail.com",
   "password": "Deep@1234"
 }
+> {%
+    client.global.set("access_token", response.body.data.access_token);
+    client.global.set("refresh_token", response.body.data.refresh_token);
+%}
+
 
 
 ### Change Password

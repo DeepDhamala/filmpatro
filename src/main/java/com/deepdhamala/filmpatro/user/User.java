@@ -2,7 +2,7 @@ package com.deepdhamala.filmpatro.user;
 
 import com.deepdhamala.filmpatro.common.AccountEntity;
 import com.deepdhamala.filmpatro.auth.principalUser.Role;
-import com.deepdhamala.filmpatro.film.movie.Movie;
+import com.deepdhamala.filmpatro.film.movie.MovieEntity;
 import com.deepdhamala.filmpatro.film.review.Review;
 import jakarta.persistence.*;
 import lombok.*;
@@ -49,5 +49,5 @@ public class User extends AccountEntity {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "movie_id")
     )
-    private Set<Movie> favorites = new HashSet<>();
+    private Set<MovieEntity> favorites = new HashSet<>();
 }

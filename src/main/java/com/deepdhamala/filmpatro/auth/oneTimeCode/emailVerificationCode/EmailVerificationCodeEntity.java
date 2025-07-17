@@ -1,7 +1,7 @@
 package com.deepdhamala.filmpatro.auth.oneTimeCode.emailVerificationCode;
 
-import com.deepdhamala.filmpatro.auth.oneTimeCode.OneTimeCodePurpose;
 import com.deepdhamala.filmpatro.auth.common.OneTimeCodeEntity;
+import com.deepdhamala.filmpatro.auth.oneTimeCode.OneTimeCodePurpose;
 import com.deepdhamala.filmpatro.user.User;
 import jakarta.persistence.*;
 import lombok.*;

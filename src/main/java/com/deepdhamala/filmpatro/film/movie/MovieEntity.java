@@ -1,8 +1,8 @@
 package com.deepdhamala.filmpatro.film.movie;
 
 import com.deepdhamala.filmpatro.common.AuditableEntity;
-import com.deepdhamala.filmpatro.film.actor.Actor;
-import com.deepdhamala.filmpatro.film.genre.Genre;
+import com.deepdhamala.filmpatro.film.actor.ActorEntity;
+import com.deepdhamala.filmpatro.film.genre.GenreEntity;
 import com.deepdhamala.filmpatro.film.media.Media;
 import com.deepdhamala.filmpatro.film.rating.Rating;
 import com.deepdhamala.filmpatro.film.review.Review;
@@ -26,7 +26,7 @@ import java.util.Set;
 @Entity
 @Table(name = "movies")
 @Audited
-public class Movie extends AuditableEntity {
+public class MovieEntity extends AuditableEntity {
 
     @Column(nullable = false)
     private String title;
@@ -43,7 +43,7 @@ public class Movie extends AuditableEntity {
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
-    private Set<Genre> genres = new HashSet<>();
+    private Set<GenreEntity> genres = new HashSet<>();
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Review> reviews = new HashSet<>();
@@ -57,7 +57,7 @@ public class Movie extends AuditableEntity {
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "actor_id")
     )
-    private Set<Actor> actors = new HashSet<>();
+    private Set<ActorEntity> actors = new HashSet<>();
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Media> media = new ArrayList<>();

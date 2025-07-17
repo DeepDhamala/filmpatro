@@ -1,7 +1,7 @@
 package com.deepdhamala.filmpatro.film.review;
 
 import com.deepdhamala.filmpatro.common.AuditableEntity;
-import com.deepdhamala.filmpatro.film.movie.Movie;
+import com.deepdhamala.filmpatro.film.movie.MovieEntity;
 import com.deepdhamala.filmpatro.user.User;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -25,7 +25,7 @@ public class Review extends AuditableEntity {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "movie_id", nullable = false)
-    private Movie movie;
+    private MovieEntity movie;
 
     @Column(nullable = false, length = 2000)
     private String reviewText;
