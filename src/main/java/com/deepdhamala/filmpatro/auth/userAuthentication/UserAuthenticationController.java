@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
+
 @RestController
 @RequestMapping("/api/v2/auth/user/authentication")
 @RequiredArgsConstructor
@@ -19,11 +20,14 @@ public class UserAuthenticationController {
     private final UserAuthenticationService<UsernamePasswordRequestDto, AccessRefreshTokenResponseDto> userAuthenticationService;
     private final DefaultAuthenticationService defaultAuthenticationService;
     private final AuthorizationCodeService authorizationCodeService;
+    private final JwtUserAuthenticationService jwtUserAuthenticationService;
+
+
 
     @PostMapping("/authenticate")
     public ResponseEntity<ApiResponse<AccessRefreshTokenResponseDto>> authenticateUser(
-            @RequestBody @Valid AuthenticationRequestDto authenticationRequestDto) {
-        var authResponse = defaultAuthenticationService.authenticateUser(authenticationRequestDto);
+            @RequestBody @Valid UsernamePasswordRequestDto usernamePasswordRequestDto) {
+        var authResponse = jwtUserAuthenticationService.authenticate(usernamePasswordRequestDto);
         return ResponseEntity.ok(ApiResponse.success(authResponse, "Authentication successful!"));
     }
 

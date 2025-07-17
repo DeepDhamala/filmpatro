@@ -8,7 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserNamePasswordToTokenAuthenticationService extends AbstractUserAuthenticationService<UsernamePasswordRequestDto, AccessRefreshTokenResponseDto> {
+public class UserNamePasswordToTokenAuthenticationService extends AbstractUserAuthenticationService<UsernamePasswordRequestDto, AccessRefreshTokenResponseDto> implements JwtUserAuthenticationService {
 
     private final JwtService jwtService;
 

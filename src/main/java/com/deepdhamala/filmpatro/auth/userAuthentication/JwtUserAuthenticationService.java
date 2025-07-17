@@ -1,0 +1,4 @@
+package com.deepdhamala.filmpatro.auth.userAuthentication;
+
+public interface JwtUserAuthenticationService extends UserAuthenticationService<UsernamePasswordRequestDto, AccessRefreshTokenResponseDto>{
+}
