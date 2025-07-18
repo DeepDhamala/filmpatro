@@ -3,6 +3,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.0-brightgreen)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-blue)](https://www.mysql.com/)
 [![TDD](https://img.shields.io/badge/Test_Driven_Development-✓-blueviolet)](https://en.wikipedia.org/wiki/Test-driven_development)
+
 **FilmPatro** is an online platform for discovering, rating, and reviewing Nepali movies. Users can create accounts, log in via social media, share feedback, and explore community perspectives on Nepali cinema.
 
 ---
