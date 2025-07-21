@@ -39,8 +39,6 @@ class ActorControllerTest {
     @MockitoBean
     private UserDetailsService userDetailsService;
 
-    @MockitoBean
-    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -53,7 +51,7 @@ class ActorControllerTest {
                 objectMapper.writeValueAsBytes(dto));
         MockMultipartFile imagePart = new MockMultipartFile("image", "tom.jpg", "image/jpeg", "fake-image".getBytes());
 
-        mockMvc.perform(multipart("/api/v1/actors/create")
+        mockMvc.perform(multipart("/api/v1/actors/add")
                         .file(actorPart)
                         .file(imagePart)
                         .contentType(MediaType.MULTIPART_FORM_DATA))

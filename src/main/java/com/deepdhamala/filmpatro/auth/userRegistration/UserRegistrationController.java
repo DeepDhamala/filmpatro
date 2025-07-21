@@ -10,14 +10,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/auth/user/registration")
 @RequiredArgsConstructor
-public class UserRegistrationController {
+class UserRegistrationController {
 
-    private final UserRegistrationService userRegistrationService;
+    private final RegistrationServiceResolver resolver;
     private final EmailVerificationCodeService emailVerificationCodeService;
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<String>> registerUser(@RequestBody @Valid UserRegisterRequestDto userRegisterRequestDto) {
-        userRegistrationService.registerNewUser(userRegisterRequestDto);
+    public ResponseEntity<ApiResponse<String>> registerUser(@RequestBody @Valid UsernameEmailPasswordRegisterRequestDto userRegisterRequestDto) {
+        var service = resolver.resolve(UsernameEmailPasswordRegisterRequestDto.class);
+        service.registerNewUser(userRegisterRequestDto);
         return ResponseEntity.ok(ApiResponse.success(null, "User Registration Successful!"));
     }
 

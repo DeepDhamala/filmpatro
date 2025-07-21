@@ -5,13 +5,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class SimpleGenreService implements GenreService{
+class SimpleGenreService implements GenreService{
 
     private final GenreRepository genreRepository;
 
     @Override
-    public GenreEntity createGenre(GenreEntity genre) {
-        return genreRepository.save(genre);
+    public GenreEntity createGenre(GenreAddRequestDto genreAddRequestDto) {
+        return genreRepository.save(GenreMapper.toEntity(genreAddRequestDto));
     }
 
     @Override

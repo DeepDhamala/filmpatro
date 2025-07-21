@@ -1,7 +1,7 @@
 package com.deepdhamala.filmpatro.user;
 
 import com.deepdhamala.filmpatro.auth.principalUser.Role;
-import com.deepdhamala.filmpatro.auth.userRegistration.UserRegisterRequestDto;
+import com.deepdhamala.filmpatro.auth.userRegistration.UsernameEmailPasswordRegisterRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -12,7 +12,7 @@ public class UserMapper {
 
     private final PasswordEncoder passwordEncoder;
 
-    public User fromRegisterRequestDto(UserRegisterRequestDto userRegisterRequestDto) {
+    public User fromRegisterRequestDto(UsernameEmailPasswordRegisterRequestDto userRegisterRequestDto) {
         return User.builder()
                 .username(userRegisterRequestDto.getUsername())
                 .email(userRegisterRequestDto.getEmail())

@@ -11,7 +11,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public void validateUserDoesNotExist(String email, String username) {
+    public void isUsernameEmailAlreadyRegistered(String email, String username) throws UserAlreadyExistsException {
         if (userRepository.existsByEmail(email)) {
             throw new UserAlreadyExistsException("Registration Failed: Email already registered.");
         }

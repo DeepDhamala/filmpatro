@@ -15,7 +15,7 @@ class ActorController {
 
     private final ActorService actorService;
 
-    @PostMapping("/create")
+    @PostMapping("/add")
     public ResponseEntity<ApiResponse<String>> createActor(@RequestPart("actor") ActorDto actorDto, @RequestPart("image")MultipartFile imageFile) {
         actorService.createActor(actorDto, imageFile);
         return ResponseEntity.ok(ApiResponse.success(null, "Actor Registration Successful!"));
