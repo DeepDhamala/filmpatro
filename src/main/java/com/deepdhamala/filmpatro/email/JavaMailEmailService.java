@@ -28,7 +28,7 @@ public class JavaMailEmailService implements EmailService{
 
             javaMailSender.send(mimeMessage);
         } catch (EmailDeliveryException e) {
-            throw new EmailDeliveryException("Failed to send password reset email: " + e.getMessage());
+            throw new EmailDeliveryException("Failed to send email: " + e.getMessage());
         } catch (Exception e){
             throw new RuntimeException("Failed to send password reset email: " + e.getMessage(), e);
         }

@@ -4,12 +4,11 @@ import com.deepdhamala.filmpatro.auth.password.PasswordMatches;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 
 @Data
 @Builder
 @PasswordMatches
-public class UserRegisterRequestDto {
+public class UsernameEmailPasswordRegisterRequestDto {
 
     @Email(message = "Invalid email format")
     @NotBlank(message = "Email is required")

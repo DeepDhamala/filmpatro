@@ -1,7 +1,7 @@
 package com.deepdhamala.filmpatro.auth.password;
 
 import com.deepdhamala.filmpatro.auth.oneTimeCode.forgetPasswordResetCode.ForgetPasswordResetRequestDto;
-import com.deepdhamala.filmpatro.auth.userRegistration.UserRegisterRequestDto;
+import com.deepdhamala.filmpatro.auth.userRegistration.UsernameEmailPasswordRegisterRequestDto;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -15,7 +15,7 @@ public class PasswordMatchesValidator implements ConstraintValidator<PasswordMat
                     dto.getPassword().equals(dto.getConfirmPassword());
         }
 
-        if (obj instanceof UserRegisterRequestDto dto) {
+        if (obj instanceof UsernameEmailPasswordRegisterRequestDto dto) {
             return dto.getPassword() != null && dto.getConfirmPassword() != null &&
                     dto.getPassword().equals(dto.getConfirmPassword());
         }

@@ -1,95 +1,105 @@
+// src/test/java/com/deepdhamala/filmpatro/film/actor/ActorControllerTest.java
 package com.deepdhamala.filmpatro.film.actor;
 
+import com.deepdhamala.filmpatro.auth.jwt.JwtService;
+import com.deepdhamala.filmpatro.common.ApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
 @WebMvcTest(ActorController.class)
-@org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc(addFilters = false) // ✅ disable security filters like JWT
+@AutoConfigureMockMvc(addFilters = false)
 class ActorControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private ActorService actorService;
+
+    @MockitoBean
+    private JwtService jwtService;
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
+
 
     @Autowired
     private ObjectMapper objectMapper;
 
     @Test
-    void createActor() throws Exception {
-        ActorDto dto = new ActorDto();
-        dto.setName("Tom Hanks");
+    void createActor_ShouldReturnSuccessMessage() throws Exception {
+        ActorDto dto = ActorDto.builder().name("Tom Hanks").build();
 
-        ActorEntity mockActor = ActorEntity.builder().id(1L).name("Tom Hanks").build();
-        Mockito.when(actorService.createActor(any(ActorDto.class), any())).thenReturn(mockActor);
+        MockMultipartFile actorPart = new MockMultipartFile("actor", "", "application/json",
+                objectMapper.writeValueAsBytes(dto));
+        MockMultipartFile imagePart = new MockMultipartFile("image", "tom.jpg", "image/jpeg", "fake-image".getBytes());
 
-        MockMultipartFile imageFile = new MockMultipartFile(
-                "image",
-                "dummy.jpg",
-                MediaType.IMAGE_JPEG_VALUE,
-                "dummy content".getBytes()
-        );
-
-        MockMultipartFile actorJson = new MockMultipartFile(
-                "actor",
-                "",
-                MediaType.APPLICATION_JSON_VALUE,
-                objectMapper.writeValueAsBytes(dto)
-        );
-
-        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/v1/actors/create")
-                        .file(imageFile)
-                        .file(actorJson)
+        mockMvc.perform(multipart("/api/v1/actors/add")
+                        .file(actorPart)
+                        .file(imagePart)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Actor Registration Successful!"))
-                .andExpect(jsonPath("$.status").value("success"))
-                .andDo(print());
+                .andExpect(jsonPath("$.message").value("Actor Registration Successful!"));
+
+        verify(actorService).createActor(any(ActorDto.class), any());
     }
 
     @Test
-    void getAllActors() throws Exception {
-        ActorEntity actor = ActorEntity.builder().id(1L).name("Tom Hanks").build();
-        Mockito.when(actorService.getAllActors()).thenReturn(List.of(actor));
+    void getAllActors_ShouldReturnListOfActors() throws Exception {
+        List<ActorEntity> actors = List.of(
+                ActorEntity.builder().id(1L).name("Actor 1").build(),
+                ActorEntity.builder().id(2L).name("Actor 2").build()
+        );
+        when(actorService.getAllActors()).thenReturn(actors);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/actors"))
+        mockMvc.perform(get("/api/v1/actors"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Tom Hanks"))
-                .andDo(print());
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].name").value("Actor 1"))
+                .andExpect(jsonPath("$[1].name").value("Actor 2"));
+
+        verify(actorService).getAllActors();
     }
 
     @Test
-    void getActorById() throws Exception {
-        ActorEntity actor = ActorEntity.builder().id(1L).name("Tom Hanks").build();
-        Mockito.when(actorService.getActorById(1L)).thenReturn(actor);
+    void getActorById_ShouldReturnActor() throws Exception {
+        Long actorId = 1L;
+        ActorEntity actor = ActorEntity.builder().id(actorId).name("Tom Hanks").build();
+        when(actorService.getActorById(actorId)).thenReturn(actor);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/actors/1"))
+        mockMvc.perform(get("/api/v1/actors/{id}", actorId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Tom Hanks"))
-                .andDo(print());
+                .andExpect(jsonPath("$.id").value(actorId))
+                .andExpect(jsonPath("$.name").value("Tom Hanks"));
+
+        verify(actorService).getActorById(actorId);
     }
 
     @Test
-    void deleteActor() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/actors/1"))
-                .andExpect(status().isNoContent()) // 204 No Content
-                .andDo(print());
+    void deleteActor_ShouldReturnNoContent() throws Exception {
+        Long actorId = 1L;
+        doNothing().when(actorService).deleteActor(actorId);
+
+        mockMvc.perform(delete("/api/v1/actors/{id}", actorId))
+                .andExpect(status().isNoContent());
+
+        verify(actorService).deleteActor(actorId);
     }
 }

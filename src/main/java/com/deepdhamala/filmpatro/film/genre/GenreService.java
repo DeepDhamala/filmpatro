@@ -1,7 +1,7 @@
 package com.deepdhamala.filmpatro.film.genre;
 
 public interface GenreService {
-    GenreEntity createGenre(GenreEntity genre);
+    GenreEntity createGenre(GenreAddRequestDto genreAddRequestDto);
 
     GenreEntity updateGenre(Long id, GenreEntity genre);
 
